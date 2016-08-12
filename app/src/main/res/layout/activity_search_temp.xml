@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_ffffff"
+    android:orientation="vertical"
+    tools:context="cn.youyunsample.home.SearchTempActivity">
+
+    <include layout="@layout/layout_top" />
+
+    <Button
+        android:id="@+id/btn_accurate_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/accurate_search_by_id" />
+
+    <Button
+        android:id="@+id/btn_dim_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dim_search_by_name" />
+
+</LinearLayout>

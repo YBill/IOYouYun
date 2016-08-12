@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_home"
+            android:checked="true"
+            android:icon="@drawable/ic_home_grey600_24dp"
+            android:title="@string/home" />
+    </group>
+
+    <item android:title="@string/app_setting">
+        <menu>
+            <item
+                android:id="@+id/menu_push_sound"
+                android:checkable="true"
+                android:icon="@drawable/ic_sound_72px"
+                android:title="@string/new_msg_sound_alert"
+                app:actionLayout="@layout/layout_checkbox" />
+            <item
+                android:id="@+id/menu_push_vibrate"
+                android:checkable="true"
+                android:icon="@drawable/ic_vibration_72px"
+                android:title="@string/new_msg_vibrate_alert"
+                app:actionLayout="@layout/layout_checkbox" />
+            <item
+                android:id="@+id/menu_push_time"
+                android:checkable="true"
+                android:icon="@drawable/ic_time_72px"
+                android:title="@string/push_alert_time"
+                app:actionLayout="@layout/layout_push_text" />
+            <item
+                android:id="@+id/menu_version"
+                android:checkable="true"
+                android:icon="@drawable/ic_version_72px"
+                android:title="@string/version_info" />
+        </menu>
+    </item>
+
+</menu>
