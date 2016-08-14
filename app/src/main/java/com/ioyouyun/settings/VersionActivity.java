@@ -1,6 +1,7 @@
 package com.ioyouyun.settings;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
@@ -21,12 +22,30 @@ public class VersionActivity extends AppCompatActivity {
     TextView tvMsg;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_version);
         ButterKnife.bind(this);
         initView();
         initData();
+    }
+
+    private void $setToolBar(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.back);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void initView(){
+        $setToolBar();
+        tvMsg.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     private void initData() {
@@ -42,25 +61,5 @@ public class VersionActivity extends AppCompatActivity {
         tvMsg.append("\n");
         tvMsg.append("\n");
         tvMsg.append(getResources().getString(R.string.version_4));
-    }
-
-    private void initView() {
-        // title
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        tvMsg.setMovementMethod(ScrollingMovementMethod.getInstance());
-    }
-
-    public void onClick() {
-        finish();
     }
 }

@@ -53,8 +53,8 @@
 
     <style name="divider_line">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1px</item>
-        <item name="android:background">@color/color_000000</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/color_e6e6e6</item>
     </style>
 
     <style name="transparentFrameWindowStyle" parent="android:style/Theme.Dialog">

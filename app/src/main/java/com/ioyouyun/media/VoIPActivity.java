@@ -31,17 +31,24 @@ public class VoIPActivity extends BaseActivity<VoIPView, VoIPPresenter> implemen
     private String nickName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vo_ip);
-        ButterKnife.bind(this);
-        getIntentExtra();
-        initData();
+    protected VoIPPresenter initPresenter() {
+        return new VoIPPresenter(this);
     }
 
     @Override
-    protected VoIPPresenter initPresenter() {
-        return new VoIPPresenter(this);
+    protected int getLayoutId() {
+        return R.layout.activity_vo_ip;
+    }
+
+    @Override
+    protected void initView() {
+        ButterKnife.bind(this);
+        getIntentExtra();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -53,7 +60,8 @@ public class VoIPActivity extends BaseActivity<VoIPView, VoIPPresenter> implemen
         }
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         btnLeft.setVisibility(View.VISIBLE);
         tvUid.setText(uid);
         tvNickname.setText(nickName);
@@ -63,6 +71,11 @@ public class VoIPActivity extends BaseActivity<VoIPView, VoIPPresenter> implemen
         } else {
             setTipsText("等待对方接听，请稍后...");
         }
+    }
+
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     private void hangUpVoIP() {

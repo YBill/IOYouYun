@@ -23,11 +23,34 @@ public class IncomingCallActivity extends BaseActivity<IncommingCallView, Incomm
     private String callName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_incoming_call);
+    protected IncommingCallPresenter initPresenter() {
+        return new IncommingCallPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_incoming_call;
+    }
+
+    @Override
+    protected void initView() {
         ButterKnife.bind(this);
         getIntentExtra();
+    }
+
+    @Override
+    protected void setListener() {
+
+    }
+
+    @Override
+    protected void initData() {
+
+    }
+
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     private void getIntentExtra() {
@@ -36,11 +59,6 @@ public class IncomingCallActivity extends BaseActivity<IncommingCallView, Incomm
             callName = intent.getStringExtra(FunctionUtil.INCOMINGNAME);
             tvUid.setText(callName);
         }
-    }
-
-    @Override
-    protected IncommingCallPresenter initPresenter() {
-        return new IncommingCallPresenter(this);
     }
 
     private void answer() {

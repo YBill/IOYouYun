@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_f5f5f5"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".group.activity.GroupSettingActivity"
+    tools:showIn="@layout/activity_group_setting">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_group_name"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:background="@color/color_ffffff"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/group_name"
+                    android:textColor="@color/color_000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_group_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="80dp"
+                    android:singleLine="true"
+                    android:textColor="@color/color_999"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View style="@style/divider_line" />
+
+            <LinearLayout
+                android:id="@+id/ll_group_intra"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:background="@color/color_ffffff"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/group_intra"
+                    android:textColor="@color/color_000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_group_intra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="100dp"
+                    android:singleLine="true"
+                    android:textColor="@color/color_999"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View style="@style/divider_line" />
+
+            <LinearLayout
+                android:id="@+id/ll_group_member"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:background="@drawable/btn_white_gray_selector"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/group_member"
+                    android:textColor="@color/color_000000"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/more" />
+            </LinearLayout>
+
+            <View style="@style/divider_line" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/color_f5f5f5" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/msg_push"
+                    android:textColor="@color/color_000000"
+                    android:textSize="14sp" />
+
+                <ToggleButton
+                    android:id="@+id/tbtn_msg_push"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@drawable/toggle_btn_selector"
+                    android:checked="false"
+                    android:text=""
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+
+            <View
+                style="@style/divider_line"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/msg_no_disturb"
+                    android:textColor="@color/color_000000"
+                    android:textSize="14sp" />
+
+                <ToggleButton
+                    android:id="@+id/tbtn_msg_no_disturb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:button="@drawable/toggle_btn_selector"
+                    android:checked="false"
+                    android:text=""
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+
+            <View
+                style="@style/divider_line"
+                android:visibility="gone" />
+
+            <View style="@style/divider_line" />
+
+            <TextView
+                android:id="@+id/tv_clear_chat"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/btn_white_gray_selector"
+                android:gravity="center"
+                android:text="@string/clear_chat_record"
+                android:textSize="16sp" />
+
+            <View style="@style/divider_line" />
+
+            <TextView
+                android:id="@+id/tv_exit_group"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/btn_white_gray_selector"
+                android:gravity="center"
+                android:text="@string/exit_group"
+                android:textSize="16sp" />
+
+            <View style="@style/divider_line" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -1,72 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_ffffff"
-    tools:context="cn.youyunsample.home.CreateGroupActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".group.activity.CreateGroupActivity">
 
-    <include
-        android:id="@+id/create_top"
-        layout="@layout/layout_top" />
-
-    <TextView
-        android:id="@+id/tv_confirm_create"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/color_f1f2f4"
-        android:gravity="center"
-        android:text="@string/confirm_create"
-        android:textSize="20sp" />
-
-    <LinearLayout
-        android:id="@+id/ll_group_name"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_below="@id/create_top"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/group_name" />
-
-        <EditText
-            android:id="@+id/et_group_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:hint="@string/mandatory" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ll_group_name"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp">
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/group_intra" />
-
-        <EditText
-            android:id="@+id/et_group_intra"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:gravity="left|top"
-            android:hint="@string/optional"
-            android:lines="3" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:text="@string/create_group"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
 
-</RelativeLayout>
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_create_group" />
+
+</android.support.design.widget.CoordinatorLayout>

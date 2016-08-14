@@ -53,12 +53,19 @@ public class ConferenceActivity extends BaseActivity<ConferenceView, ConferenceP
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_in_call);
+    protected int getLayoutId() {
+        return R.layout.activity_in_call;
+    }
+
+    @Override
+    protected void initView() {
         ButterKnife.bind(this);
         getIntentExtra();
-        initData();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -70,7 +77,8 @@ public class ConferenceActivity extends BaseActivity<ConferenceView, ConferenceP
         }
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         tvTopTitle.setText(getResources().getString(R.string.more_conference));
         tvTopTitle.setVisibility(View.VISIBLE);
         btnLeft.setVisibility(View.VISIBLE);
@@ -84,6 +92,11 @@ public class ConferenceActivity extends BaseActivity<ConferenceView, ConferenceP
 
         adapter = new MemberListAdapter(this);
         lvUserMember.setAdapter(adapter);
+    }
+
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     private void setListNumber(int number) {

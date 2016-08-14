@@ -3,8 +3,6 @@ package com.ioyouyun.login;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -20,36 +18,40 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
     private Button loginBtn;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+    protected LoginPresenter initPresenter() {
+        return new LoginPresenter(this);
+    }
 
-        // title
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_login;
+    }
 
-        // view
-        loginBtn = (Button) findViewById(R.id.btn_login);
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.login();
-            }
-        });
+    @Override
+    protected void setToolBar() {
+        super.setToolBar();
+    }
+
+    @Override
+    protected void initView() {
+        setToolBar();
+
+        loginBtn = findView(R.id.btn_login);
+    }
+
+    @Override
+    protected void setListener() {
+        loginBtn.setOnClickListener(this);
+    }
+
+    @Override
+    protected void initData() {
 
     }
 
     @Override
-    protected LoginPresenter initPresenter() {
-        return new LoginPresenter(this);
+    public void widgetClick(View v) {
+        presenter.login();
     }
 
     @Override
@@ -61,7 +63,7 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String nickname = editText.getText().toString().trim();
-                if(!TextUtils.isEmpty(nickname))
+                if (!TextUtils.isEmpty(nickname))
                     presenter.setNickName(nickname);
 
                 loginSuccess();

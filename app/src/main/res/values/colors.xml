@@ -7,7 +7,6 @@
     <color name="navigationBarColor">#1a000000</color>
     <color name="reveal_color">#1b000000</color>
     <color name="color_f5f5f5">#f5f5f5</color>
-
     <color name="transparent">#00000000</color>
     <color name="color_ebebeb">#ebebeb</color>
     <color name="color_c0c0c0">#c0c0c0</color>
@@ -29,6 +28,7 @@
     <color name="color_1fbaf3">#1fbaf3</color>
     <color name="color_f9584c">#f9584c</color>
     <color name="color_9b95fb">#9b95fb</color>
-
+    <color name="color_e6e6e6">#e6e6e6</color>
+    <color name="color_6071b9">#6071b9</color>
 
 </resources>

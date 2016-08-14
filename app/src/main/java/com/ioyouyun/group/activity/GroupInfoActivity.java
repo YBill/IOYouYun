@@ -36,12 +36,24 @@ public class GroupInfoActivity extends BaseActivity<GroupInfoView, GroupInfoPres
     private GroupInfoEntity groupInfoEntity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_info);
+    protected GroupInfoPresenter initPresenter() {
+        return new GroupInfoPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_group_info;
+    }
+
+    @Override
+    protected void initView() {
         ButterKnife.bind(this);
         getIntentExtra();
-        initData();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -52,16 +64,17 @@ public class GroupInfoActivity extends BaseActivity<GroupInfoView, GroupInfoPres
     }
 
     @Override
-    protected GroupInfoPresenter initPresenter() {
-        return new GroupInfoPresenter(this);
-    }
-
-    private void initData() {
+    protected void initData() {
         if (groupInfoEntity != null)
             tvTopTitle.setText(groupInfoEntity.getName());
         tvTopTitle.setVisibility(View.VISIBLE);
         btnLeft.setVisibility(View.VISIBLE);
         setGroupInfo(groupInfoEntity);
+    }
+
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     private void setGroupInfo(GroupInfoEntity entity) {

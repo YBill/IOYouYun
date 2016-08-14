@@ -42,8 +42,9 @@ import java.util.List;
 /**
  * Created by 卫彪 on 2016/6/3.
  */
-public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implements ChatView, View.OnClickListener {
+public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implements ChatView {
 
+    public static final int REQUEST_CODE_SETTING = 1003;
     public static final int REQUEST_CODE_CAMERA = 1001;
     public static final int REQUEST_CODE_LOCAL = 1002;
     private Button buttonSetModeVoice; // 左侧语音键盘按钮
@@ -62,8 +63,7 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     private TextView takePhotoBtn; // 拍照
     private ListView chatListView; // 聊天界面
     private TextView topTitleText; // title
-    private Button backBtn; // 返回
-    private Button clearBtn; // 清空
+    private TextView clearBtn; // 清空
 
     private ChatMsgAdapter chatMsgAdapter; // Chat Adapter
 
@@ -80,101 +80,49 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     private ConvType convType;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-        //启动activity时不自动弹出软键盘
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        initViews();
-        initListener();
-        initData();
-
-        getIntentExtra();
-
-        backBtn.setText(getResources().getString(R.string.btn_back));
-        backBtn.setVisibility(View.VISIBLE);
-        if (ConvType.group == convType)
-            clearBtn.setText(getResources().getString(R.string.string_setting));
-        else
-            clearBtn.setText(getResources().getString(R.string.btn_clear));
-        clearBtn.setVisibility(View.VISIBLE);
-        topTitleText.setText(nickName);
-        topTitleText.setVisibility(View.VISIBLE);
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        presenter.refreshLocalData(toUId);
-    }
-
-    @Override
     protected ChatPresenter initPresenter() {
         return new ChatPresenter();
     }
 
-    private void getIntentExtra() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            toUId = intent.getStringExtra("toUid");
-            nickName = intent.getStringExtra("nickName");
-            int type = intent.getIntExtra("chatType", 0); // 0:单聊 1：群聊
-            if (type == 1)
-                convType = ConvType.group;
-            else
-                convType = ConvType.single;
 
-        }
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_chat;
     }
 
-    private void initData() {
-        // init adapter
-        chatMsgAdapter = new ChatMsgAdapter(this);
-        chatListView.setAdapter(chatMsgAdapter);
+    @Override
+    protected void setToolBar() {
+        super.setToolBar();
     }
 
-    private void initViews() {
-        buttonSetModeVoice = (Button) findViewById(R.id.btn_set_mode_voice);
-        buttonPressToSpeak = findViewById(R.id.btn_press_to_speak);
-        textPressToSpeck = (TextView) findViewById(R.id.tv_press_to_speck);
-        editLayout = (RelativeLayout) findViewById(R.id.edittext_layout);
+    @Override
+    protected void initView() {
+        buttonSetModeVoice = findView(R.id.btn_set_mode_voice);
+        buttonPressToSpeak = findView(R.id.btn_press_to_speak);
+        textPressToSpeck = findView(R.id.tv_press_to_speck);
+        editLayout = findView(R.id.edittext_layout);
         editLayout.setBackgroundResource(R.drawable.input_bar_bg_normal);
         editLayout.requestFocus();
-        mEditTextContent = (EditText) findViewById(R.id.et_sendmessage);
-        emojiIcon = (ImageView) findViewById(R.id.iv_emoticons_normal);
-        btnMore = (Button) findViewById(R.id.btn_more);
-        buttonSend = findViewById(R.id.btn_send);
-        modeView = findViewById(R.id.ll_more);
-        expressionViewPager = (ViewPager) findViewById(R.id.vp_emoji);
-        emojiIconContainer = findViewById(R.id.ll_face_container);
-        btnContainer = findViewById(R.id.ll_btn_container);
-        photoGalleryBtn = (TextView) findViewById(R.id.tv_picture);
-        takePhotoBtn = (TextView) findViewById(R.id.tv_take_photo);
-        chatListView = (ListView) findViewById(R.id.lv_chat);
-        topTitleText = (TextView) findViewById(R.id.tv_top_title);
-        backBtn = (Button) findViewById(R.id.btn_left);
-        clearBtn = (Button) findViewById(R.id.btn_right);
+        mEditTextContent = findView(R.id.et_sendmessage);
+        emojiIcon = findView(R.id.iv_emoticons_normal);
+        btnMore = findView(R.id.btn_more);
+        buttonSend = findView(R.id.btn_send);
+        modeView = findView(R.id.ll_more);
+        expressionViewPager = findView(R.id.vp_emoji);
+        emojiIconContainer = findView(R.id.ll_face_container);
+        btnContainer = findView(R.id.ll_btn_container);
+        photoGalleryBtn = findView(R.id.tv_picture);
+        takePhotoBtn = findView(R.id.tv_take_photo);
+        chatListView = findView(R.id.lv_chat);
+        topTitleText = findView(R.id.tv_title);
+        clearBtn = findView(R.id.btn_right);
+
+        getIntentExtra();
+        setToolBar();
     }
 
-   /* private PullToRefreshBase.OnRefreshListener2<ListView> refreshListListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
-
-        @Override
-        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
-            //下拉
-            presenter.getHistory(toUId, convType);
-        }
-
-        @Override
-        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
-
-        }
-
-    };*/
-
-    private void initListener() {
+    @Override
+    protected void setListener() {
         buttonSetModeVoice.setOnClickListener(this);
         buttonPressToSpeak.setOnTouchListener(new PressToSpeakListener());
         mEditTextContent.setOnClickListener(this);
@@ -183,7 +131,6 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
         buttonSend.setOnClickListener(this);
         takePhotoBtn.setOnClickListener(this);
         photoGalleryBtn.setOnClickListener(this);
-        backBtn.setOnClickListener(this);
         clearBtn.setOnClickListener(this);
         chatListView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -226,6 +173,126 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
             }
         });
     }
+
+    @Override
+    protected void initData() {
+        //启动activity时不自动弹出软键盘
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // init adapter
+        chatMsgAdapter = new ChatMsgAdapter(this);
+        chatListView.setAdapter(chatMsgAdapter);
+
+        if (ConvType.group == convType)
+            clearBtn.setText(getResources().getString(R.string.string_setting));
+        else
+            clearBtn.setText(getResources().getString(R.string.btn_clear));
+        clearBtn.setVisibility(View.VISIBLE);
+        topTitleText.setText(nickName);
+        topTitleText.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void widgetClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_set_mode_voice:
+                isSpeck = !isSpeck;
+                if (isSpeck) {
+                    hideKeyboard();
+                    buttonSetModeVoice.setBackgroundResource(R.drawable.chatting_setmode_keyboard_btn_normal);
+                    editLayout.setVisibility(View.GONE);
+                    buttonPressToSpeak.setVisibility(View.VISIBLE);
+                    btnMore.setVisibility(View.VISIBLE);
+                    buttonSend.setVisibility(View.GONE);
+                } else {
+                    buttonSetModeVoice.setBackgroundResource(R.drawable.icon_chat_voice);
+                    buttonPressToSpeak.setVisibility(View.GONE);
+                    editLayout.setVisibility(View.VISIBLE);
+                    if (TextUtils.isEmpty(mEditTextContent.getText().toString())) {
+                        btnMore.setVisibility(View.VISIBLE);
+                        buttonSend.setVisibility(View.GONE);
+                    } else {
+                        btnMore.setVisibility(View.GONE);
+                        buttonSend.setVisibility(View.VISIBLE);
+                    }
+                }
+                break;
+            case R.id.iv_emoticons_normal:
+                hideKeyboard();
+                showEmojiView();
+                modeView.setVisibility(View.VISIBLE);
+                emojiIconContainer.setVisibility(View.VISIBLE);
+                btnContainer.setVisibility(View.GONE);
+                break;
+            case R.id.btn_more:
+                hideKeyboard();
+                modeView.setVisibility(View.VISIBLE);
+                emojiIconContainer.setVisibility(View.GONE);
+                btnContainer.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btn_right:
+                if (ConvType.group == convType) {
+                    // 设置
+                    Intent intent = new Intent(this, GroupSettingActivity.class);
+                    intent.putExtra("gid", toUId);
+                    startActivityForResult(intent, REQUEST_CODE_SETTING);
+                } else
+                    presenter.clearLocalData(toUId);
+                break;
+            case R.id.tv_take_photo:
+                selectPicFromCamera();
+                break;
+            case R.id.tv_picture:
+                selectPicFromLocal();
+                break;
+            case R.id.et_sendmessage:
+                editLayout.setBackgroundResource(R.drawable.input_bar_bg_active);
+                modeView.setVisibility(View.GONE);
+                break;
+            case R.id.btn_send:
+                String text = mEditTextContent.getText().toString();
+                if(!TextUtils.isEmpty(text))
+                    presenter.sendText(toUId, text, nickName, convType);
+                break;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.refreshLocalData(toUId);
+    }
+
+    private void getIntentExtra() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            toUId = intent.getStringExtra("toUid");
+            nickName = intent.getStringExtra("nickName");
+            int type = intent.getIntExtra("chatType", 0); // 0:单聊 1：群聊
+            if (type == 1)
+                convType = ConvType.group;
+            else
+                convType = ConvType.single;
+
+        }
+    }
+
+
+   /* private PullToRefreshBase.OnRefreshListener2<ListView> refreshListListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
+
+        @Override
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+            //下拉
+            presenter.getHistory(toUId, convType);
+        }
+
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+
+        }
+
+    };*/
 
     private String getEmojiStringByUnicode(int unicodeJoy) {
         return new String(Character.toChars(unicodeJoy));
@@ -384,74 +451,6 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_set_mode_voice:
-                isSpeck = !isSpeck;
-                if (isSpeck) {
-                    hideKeyboard();
-                    buttonSetModeVoice.setBackgroundResource(R.drawable.chatting_setmode_keyboard_btn_normal);
-                    editLayout.setVisibility(View.GONE);
-                    buttonPressToSpeak.setVisibility(View.VISIBLE);
-                    btnMore.setVisibility(View.VISIBLE);
-                    buttonSend.setVisibility(View.GONE);
-                } else {
-                    buttonSetModeVoice.setBackgroundResource(R.drawable.icon_chat_voice);
-                    buttonPressToSpeak.setVisibility(View.GONE);
-                    editLayout.setVisibility(View.VISIBLE);
-                    if (TextUtils.isEmpty(mEditTextContent.getText().toString())) {
-                        btnMore.setVisibility(View.VISIBLE);
-                        buttonSend.setVisibility(View.GONE);
-                    } else {
-                        btnMore.setVisibility(View.GONE);
-                        buttonSend.setVisibility(View.VISIBLE);
-                    }
-                }
-                break;
-            case R.id.iv_emoticons_normal:
-                hideKeyboard();
-                showEmojiView();
-                modeView.setVisibility(View.VISIBLE);
-                emojiIconContainer.setVisibility(View.VISIBLE);
-                btnContainer.setVisibility(View.GONE);
-                break;
-            case R.id.btn_more:
-                hideKeyboard();
-                modeView.setVisibility(View.VISIBLE);
-                emojiIconContainer.setVisibility(View.GONE);
-                btnContainer.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btn_left:
-                finish();
-                break;
-            case R.id.btn_right:
-                if (ConvType.group == convType) {
-                    // 设置
-                    Intent intent = new Intent(this, GroupSettingActivity.class);
-                    intent.putExtra("gid", toUId);
-                    startActivity(intent);
-                } else
-                    presenter.clearLocalData(toUId);
-                break;
-            case R.id.tv_take_photo:
-                selectPicFromCamera();
-                break;
-            case R.id.tv_picture:
-                selectPicFromLocal();
-                break;
-            case R.id.et_sendmessage:
-                editLayout.setBackgroundResource(R.drawable.input_bar_bg_active);
-                modeView.setVisibility(View.GONE);
-                break;
-            case R.id.btn_send:
-                String text = mEditTextContent.getText().toString();
-                if(!TextUtils.isEmpty(text))
-                    presenter.sendText(toUId, text, nickName, convType);
-                break;
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
@@ -464,6 +463,8 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
                 if (data != null) {
                     sendLocalImage(data);
                 }
+            } else if(requestCode == REQUEST_CODE_SETTING){
+                finish();
             }
         }
     }

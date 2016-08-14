@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_ffffff"
-    tools:context="cn.youyunsample.home.InviteMemberActivity">
+    tools:context=".contacts.InviteMemberActivity">
 
     <TextView
         android:id="@+id/tv_confirm_invite"
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/fragment_contact"
-        android:name="cn.youyunsample.home.fragment.ContactsFragment"
+        android:name="com.ioyouyun.home.fragment.ContactsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/tv_confirm_invite" />

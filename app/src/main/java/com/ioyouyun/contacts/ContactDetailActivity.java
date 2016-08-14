@@ -36,17 +36,24 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
     private String nickName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_contact_detail);
-        ButterKnife.bind(this);
-        getIntentExtra();
-        initData();
+    protected ContactDetailPresenter initPresenter() {
+        return new ContactDetailPresenter(this);
     }
 
     @Override
-    protected ContactDetailPresenter initPresenter() {
-        return new ContactDetailPresenter(this);
+    protected int getLayoutId() {
+        return R.layout.activity_contact_detail;
+    }
+
+    @Override
+    protected void initView() {
+        ButterKnife.bind(this);
+        getIntentExtra();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -57,13 +64,19 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
         }
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         tvTopTitle.setText(getResources().getString(R.string.contact_detail));
         tvTopTitle.setVisibility(View.VISIBLE);
         btnLeft.setVisibility(View.VISIBLE);
 
         tvNickname.setText(nickName);
         tvUid.setText(uid);
+    }
+
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     /**

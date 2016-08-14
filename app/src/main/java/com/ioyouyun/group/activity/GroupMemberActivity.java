@@ -1,9 +1,9 @@
 package com.ioyouyun.group.activity;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,39 +14,49 @@ import com.ioyouyun.group.adapter.GroupMemberAdapter;
 import com.ioyouyun.group.model.GroupMemberEntity;
 import com.ioyouyun.group.presenter.GroupMemberPresenter;
 import com.ioyouyun.group.view.GroupMemberView;
-import com.ioyouyun.widgets.LoddingDialog;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemberPresenter> implements GroupMemberView {
 
-    @BindView(R.id.tv_top_title)
-    TextView tvTopTitle;
-    @BindView(R.id.btn_left)
-    Button btnLeft;
-    @BindView(R.id.btn_right)
-    Button btnRight;
     @BindView(R.id.lv_group_member)
     ListView lvGroupMember;
-
-    private LoddingDialog loddingDialog;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
 
     private GroupMemberAdapter groupMemberAdapter;
     private String groupId;
     private static final int REQUEST_CODE_INVITE_MEMBER = 1001;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_member);
+    protected GroupMemberPresenter initPresenter() {
+        return new GroupMemberPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_group_member;
+    }
+
+    @Override
+    protected void setToolBar() {
+        super.setToolBar();
+    }
+
+    @Override
+    protected void initView() {
         ButterKnife.bind(this);
         getIntentExtra();
-        initData();
+        setToolBar();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -55,33 +65,45 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
             groupId = intent.getStringExtra("gid");
     }
 
-    private void initData() {
-        tvTopTitle.setText(getResources().getString(R.string.group_member));
-        tvTopTitle.setVisibility(View.VISIBLE);
-        btnLeft.setText(getResources().getString(R.string.btn_back));
-        btnLeft.setVisibility(View.VISIBLE);
-        btnRight.setText(getResources().getString(R.string.invite));
-        btnRight.setVisibility(View.VISIBLE);
-
-        loddingDialog = new LoddingDialog(this);
-
+    @Override
+    protected void initData() {
         groupMemberAdapter = new GroupMemberAdapter(this);
         lvGroupMember.setAdapter(groupMemberAdapter);
 
         presenter.getGroupMember(groupId);
     }
 
-    private void refreshAdapter(List<GroupMemberEntity> list) {
-        if (list != null) {
-            tvTopTitle.setText(getResources().getString(R.string.group_member) + "(" + list.size() + ")");
-            groupMemberAdapter.setMemberList(list);
-        }
-        groupMemberAdapter.notifyDataSetChanged();
+    @Override
+    public void widgetClick(View v) {
+
     }
 
     @Override
-    protected GroupMemberPresenter initPresenter() {
-        return new GroupMemberPresenter(this);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.group_member, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_group_member) {
+            Intent intent = new Intent(this, InviteMemberActivity.class);
+            intent.putExtra("flag", 1);
+            intent.putExtra("gid", groupId);
+            startActivityForResult(intent, REQUEST_CODE_INVITE_MEMBER);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshAdapter(List<GroupMemberEntity> list) {
+        if (list != null) {
+            tvTitle.setText(getResources().getString(R.string.group_member) + "(" + list.size() + ")");
+            groupMemberAdapter.setMemberList(list);
+        }
+        groupMemberAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -99,7 +121,6 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
         loddingDialog.cancleProgress();
     }
 
-    @OnClick({R.id.btn_left, R.id.btn_right})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_left:

@@ -3,7 +3,7 @@ package com.ioyouyun.contacts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.ioyouyun.R;
@@ -17,7 +17,7 @@ import com.ioyouyun.wchat.WeimiInstance;
 
 import java.util.List;
 
-public class InviteMemberActivity extends FragmentActivity {
+public class InviteMemberActivity extends AppCompatActivity {
 
     private ContactsFragment contactsFragment;
     private View confirmInvite;

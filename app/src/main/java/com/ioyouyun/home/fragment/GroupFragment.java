@@ -8,19 +8,17 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.ioyouyun.R;
 import com.ioyouyun.base.BaseFragment;
 import com.ioyouyun.group.activity.CreateGroupActivity;
+import com.ioyouyun.group.adapter.GroupListAdapter;
 import com.ioyouyun.group.model.GroupInfoEntity;
 import com.ioyouyun.group.presenter.GroupPresenter;
 import com.ioyouyun.group.view.GroupView;
-import com.ioyouyun.group.adapter.GroupListAdapter;
 import com.ioyouyun.home.widgets.DividerItemDecoration;
 import com.ioyouyun.home.widgets.ScrollChildSwipeRefreshLayout;
 
@@ -52,19 +50,16 @@ public class GroupFragment extends BaseFragment<GroupView, GroupPresenter> imple
 
     public GroupFragment() {
         // Required empty public constructor
-        Log.v("Bill", "GroupFragment");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("Bill", "GroupFragment onCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.v("Bill", "GroupFragment onCreateView");
         View view = inflater.inflate(R.layout.fragment_group, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_group);
         recyclerView.setMotionEventSplittingEnabled(false);
@@ -128,17 +123,16 @@ public class GroupFragment extends BaseFragment<GroupView, GroupPresenter> imple
 
     @Override
     public void setListView(List<GroupInfoEntity> list) {
-        swipeRefreshLayout.setRefreshing(false);
         refreshAdapter(list);
     }
 
     @Override
     public void showLoading() {
-
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void hideLoading() {
-
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

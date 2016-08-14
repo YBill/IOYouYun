@@ -74,12 +74,6 @@ public class FunctionUtil {
     public static final String DOWNLOAD_FILEID = "download_fileid";
     public static final String DOWNLOAD_PROGRESS = "download_progress";
 
-    /**
-     * HomeActivity的启动模式是singleTask,表示进入HomeActivity后的操作
-     */
-    public static final String INTENT_HOME_TYPE = "intent_home_type";
-    public static final String REFRESH_GROUP = "refresh_group"; // 刷新group
-
     public static final String CONFERENCEACTIVITY_PATH = "cn.youyunsample.media.ConferenceActivity";
     public static final String VOIPACTIVITY_PATH = "cn.youyunsample.media.VoIPActivity";
     public static final String BEINVITEACTIVITYACTIVITY_PATH = "cn.youyunsample.media.BeInviteActivity";

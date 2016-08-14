@@ -1,190 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_ffffff"
-    tools:context="cn.youyunsample.home.GroupSettingActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".group.activity.GroupSettingActivity">
 
-    <include
-        android:id="@+id/setting_top"
-        layout="@layout/layout_top" />
-
-    <ScrollView
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/setting_top">
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-        <LinearLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/ll_group_name"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/group_name"
-                    android:textColor="@color/color_000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_group_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxWidth="80dp"
-                    android:singleLine="true"
-                    android:textColor="@color/color_999"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <View style="@style/divider_line" />
-
-            <LinearLayout
-                android:id="@+id/ll_group_intra"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/group_intra"
-                    android:textColor="@color/color_000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_group_intra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxWidth="100dp"
-                    android:singleLine="true"
-                    android:textColor="@color/color_999"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <View style="@style/divider_line" />
-
-            <LinearLayout
-                android:id="@+id/ll_group_member"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/group_member"
-                    android:textColor="@color/color_000000"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/more" />
-            </LinearLayout>
-
-            <View style="@style/divider_line" />
-
-            <View
-                style="@style/divider_line"
-                android:layout_marginTop="10dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/msg_push"
-                    android:textColor="@color/color_000000"
-                    android:textSize="14sp" />
-
-                <ToggleButton
-                    android:id="@+id/tbtn_msg_push"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:button="@drawable/toggle_btn_selector"
-                    android:checked="false"
-                    android:text=""
-                    android:textOff=""
-                    android:textOn="" />
-            </LinearLayout>
-
-            <View style="@style/divider_line" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginLeft="10dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/msg_no_disturb"
-                    android:textColor="@color/color_000000"
-                    android:textSize="14sp" />
-
-                <ToggleButton
-                    android:id="@+id/tbtn_msg_no_disturb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:button="@drawable/toggle_btn_selector"
-                    android:checked="false"
-                    android:text=""
-                    android:textOff=""
-                    android:textOn="" />
-            </LinearLayout>
-
-            <View style="@style/divider_line" />
-
-            <View
-                style="@style/divider_line"
-                android:layout_marginTop="10dp" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <TextView
-                android:id="@+id/tv_clear_chat"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:text="@string/clear_chat_record" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:text="@string/string_setting"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
 
-            <View style="@style/divider_line" />
+        </android.support.v7.widget.Toolbar>
 
-            <TextView
-                android:id="@+id/tv_exit_group"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:text="@string/exit_group" />
+    </android.support.design.widget.AppBarLayout>
 
-            <View style="@style/divider_line" />
+    <include layout="@layout/content_group_setting" />
 
-        </LinearLayout>
-    </ScrollView>
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

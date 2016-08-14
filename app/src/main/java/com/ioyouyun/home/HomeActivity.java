@@ -50,9 +50,17 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
     private TextView pushTextView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+    protected HomePresenter initPresenter() {
+        return new HomePresenter();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_home;
+    }
+
+    @Override
+    protected void setToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(FunctionUtil.nickname);
         setSupportActionBar(toolbar);
@@ -62,37 +70,59 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    @Override
+    protected void initView() {
+        setToolBar();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        int count = navigationView.getHeaderCount();
-        if (count == 1) {
-            View view = navigationView.getHeaderView(0);
-            userNameText = (TextView) view.findViewById(R.id.tv_user_name);
-            uidText = (TextView) view.findViewById(R.id.tv_uid);
-            userNameText.setText(FunctionUtil.nickname);
-            uidText.setText(FunctionUtil.uid);
-        }
+        View view = navigationView.getHeaderView(0);
+        userNameText = (TextView) view.findViewById(R.id.tv_user_name);
+        uidText = (TextView) view.findViewById(R.id.tv_uid);
+
         Menu menu = navigationView.getMenu();
         homeMemu = menu.findItem(R.id.menu_home);
-
         MenuItem pushMenu = menu.findItem(R.id.menu_push_time);
         View pushView = MenuItemCompat.getActionView(pushMenu);
         pushTextView = (TextView) pushView.findViewById(R.id.tv_push_time);
-
         soundMemu = menu.findItem(R.id.menu_push_sound);
         View soundView = MenuItemCompat.getActionView(soundMemu);
         soundCb = (CheckBox) soundView.findViewById(R.id.checkbox);
-        soundCb.setChecked(true);
-
         vibrateMemu = menu.findItem(R.id.menu_push_vibrate);
         View vibrateView = MenuItemCompat.getActionView(vibrateMemu);
         vibrateCb = (CheckBox) vibrateView.findViewById(R.id.checkbox);
 
-
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
+
+    }
+
+    @Override
+    protected void setListener() {
+        navigationView.setNavigationItemSelectedListener(this);
+        soundCb.setOnClickListener(this);
+        vibrateCb.setOnClickListener(this);
+    }
+
+    @Override
+    protected void initData() {
+        userNameText.setText(FunctionUtil.nickname);
+        uidText.setText(FunctionUtil.uid);
+
+        vibrateCb.setChecked(PushSharedUtil.getInstance().getVibration());
+        soundCb.setChecked(PushSharedUtil.getInstance().getSound());
+
         setupViewPager(viewPager);
+    }
+
+    @Override
+    public void widgetClick(View v) {
+        if(v == soundCb){
+            PushSharedUtil.getInstance().setSound(soundCb.isChecked());
+        }else if(v == vibrateCb){
+            PushSharedUtil.getInstance().setVibration(vibrateCb.isChecked());
+        }
     }
 
     @Override
@@ -104,11 +134,6 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    protected HomePresenter initPresenter() {
-        return new HomePresenter();
     }
 
     private void setupViewPager(ViewPager viewPager) {

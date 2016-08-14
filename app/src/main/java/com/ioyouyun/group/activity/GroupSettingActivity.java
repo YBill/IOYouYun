@@ -1,9 +1,8 @@
 package com.ioyouyun.group.activity;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -13,12 +12,8 @@ import com.ioyouyun.datamanager.YouyunDbManager;
 import com.ioyouyun.group.model.GroupInfoEntity;
 import com.ioyouyun.group.presenter.GroupSettingPresenter;
 import com.ioyouyun.group.view.GroupSettingView;
-import com.ioyouyun.home.HomeActivity;
-import com.ioyouyun.observer.MessageEvent;
 import com.ioyouyun.utils.FunctionUtil;
 import com.ioyouyun.widgets.LoddingDialog;
-
-import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,10 +21,6 @@ import butterknife.OnClick;
 
 public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSettingPresenter> implements GroupSettingView {
 
-    @BindView(R.id.tv_top_title)
-    TextView tvTopTitle;
-    @BindView(R.id.btn_left)
-    Button btnLeft;
     @BindView(R.id.tv_group_name)
     TextView tvGroupName;
     @BindView(R.id.tv_group_intra)
@@ -46,12 +37,30 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
     private int role; // 群权限
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_setting);
+    protected GroupSettingPresenter initPresenter() {
+        return new GroupSettingPresenter(this);
+    }
+
+    @Override
+    protected void setToolBar() {
+        super.setToolBar();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_group_setting;
+    }
+
+    @Override
+    protected void initView() {
         ButterKnife.bind(this);
         getIntentExtra();
-        initData();
+        setToolBar();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -60,28 +69,21 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
             groupId = intent.getStringExtra("gid");
     }
 
-    private void initData() {
-        tvTopTitle.setText(getResources().getString(R.string.string_setting));
-        tvTopTitle.setVisibility(View.VISIBLE);
-        btnLeft.setText(getResources().getString(R.string.btn_back));
-        btnLeft.setVisibility(View.VISIBLE);
-
+    @Override
+    protected void initData() {
         loddingDialog = new LoddingDialog(this);
 
         presenter.getGroupInfo(groupId);
     }
 
     @Override
-    protected GroupSettingPresenter initPresenter() {
-        return new GroupSettingPresenter(this);
+    public void widgetClick(View v) {
+
     }
 
-    @OnClick({R.id.btn_left, R.id.ll_group_name, R.id.ll_group_intra, R.id.ll_group_member, R.id.tv_clear_chat, R.id.tv_exit_group})
+    @OnClick({R.id.ll_group_name, R.id.ll_group_intra, R.id.ll_group_member, R.id.tv_clear_chat, R.id.tv_exit_group})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_left:
-                finish();
-                break;
             case R.id.ll_group_name:
                 break;
             case R.id.ll_group_intra:
@@ -98,13 +100,13 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
                 break;
             case R.id.tv_exit_group:
                 if (role == 4) {
-                    FunctionUtil.toastMessage("您是群主，不可退群");
-                    /*Snackbar.make(tvExitGroup, "确认删除?", Snackbar.LENGTH_LONG).setAction("删除", new View.OnClickListener() {
+//                    FunctionUtil.toastMessage("您是群主，不可退群");
+                    Snackbar.make(tvExitGroup, "确认解散群?", Snackbar.LENGTH_LONG).setAction("解散", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             presenter.deleteGroup(groupId);
                         }
-                    }).show();*/
+                    }).show();
                 } else {
                     presenter.exitGroup(groupId);
                 }
@@ -123,10 +125,8 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
     public void exitGroup(String gid, boolean result) {
         if (result) {
             FunctionUtil.toastMessage("退群成功");
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra(FunctionUtil.INTENT_HOME_TYPE, FunctionUtil.REFRESH_GROUP);
-            startActivity(intent);
+            setResult(RESULT_OK);
+            finish();
         } else
             FunctionUtil.toastMessage("退群失败");
     }
@@ -135,18 +135,10 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
     public void delGroup(String gid, boolean result) {
         if (result) {
             FunctionUtil.toastMessage("解散群成功");
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra(FunctionUtil.INTENT_HOME_TYPE, FunctionUtil.REFRESH_GROUP);
-            startActivity(intent);
+            setResult(RESULT_OK);
+            finish();
         } else
             FunctionUtil.toastMessage("解散群失败");
-    }
-
-    private void notifyGroupList(String gid){
-        MessageEvent.GroupListEvent event = new MessageEvent.GroupListEvent();
-        event.groupId = gid;
-        EventBus.getDefault().post(event);
     }
 
     @Override

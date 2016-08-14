@@ -31,13 +31,25 @@ public class ApplyAddGroupActivity extends BaseActivity<ApplyAddGroupView, Apply
     private LoddingDialog loddingDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_apply_add_group);
+    protected ApplyAddGroupPresenter initPresenter() {
+        return new ApplyAddGroupPresenter(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_apply_add_group;
+    }
+
+    @Override
+    protected void initView() {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         ButterKnife.bind(this);
         getIntentExtra();
-        initData();
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void getIntentExtra() {
@@ -46,7 +58,8 @@ public class ApplyAddGroupActivity extends BaseActivity<ApplyAddGroupView, Apply
             groupId = intent.getStringExtra("gid");
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         tvTopTitle.setText(getResources().getString(R.string.add_group_apply));
         tvTopTitle.setVisibility(View.VISIBLE);
         btnLeft.setVisibility(View.VISIBLE);
@@ -55,8 +68,8 @@ public class ApplyAddGroupActivity extends BaseActivity<ApplyAddGroupView, Apply
     }
 
     @Override
-    protected ApplyAddGroupPresenter initPresenter() {
-        return new ApplyAddGroupPresenter(this);
+    public void widgetClick(View v) {
+
     }
 
     @Override

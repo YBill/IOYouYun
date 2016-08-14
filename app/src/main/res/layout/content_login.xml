@@ -45,7 +45,7 @@
         android:layout_below="@id/tv_title2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:background="@drawable/login_btn_selector"
+        android:background="@drawable/button_selector"
         android:text="免注册登录"
         android:textColor="@color/color_ffffff"
         android:textStyle="bold" />
