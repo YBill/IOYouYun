@@ -68,8 +68,8 @@ public class ChatRequestImpl implements ChatRequest {
             for (int i = 1; i <= sliceCount; i++) {
                 list.add(i);
             }
-            ReceiveRunnable.fileSend.put(msgId, list);
-            ReceiveRunnable.fileSendCount.put(msgId, sliceCount);
+//            ReceiveRunnable.fileSend.put(msgId, list);
+//            ReceiveRunnable.fileSendCount.put(msgId, sliceCount);
         } else {
             if (listener != null)
                 listener.onFaild();

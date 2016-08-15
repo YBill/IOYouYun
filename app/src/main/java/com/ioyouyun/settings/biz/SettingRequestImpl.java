@@ -29,7 +29,7 @@ public class SettingRequestImpl implements SettingRequest {
                         }
                     } catch (JSONException e) {
                         if (listener != null)
-                            listener.onFaild();
+                            listener.onFail();
                         e.printStackTrace();
                     }
                 }

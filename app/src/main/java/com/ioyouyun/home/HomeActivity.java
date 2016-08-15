@@ -2,7 +2,6 @@ package com.ioyouyun.home;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -49,6 +48,8 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
     private CheckBox vibrateCb;
     private TextView pushTextView;
 
+    private ContactsFragment contactsFragment;
+
     @Override
     protected HomePresenter initPresenter() {
         return new HomePresenter();
@@ -60,7 +61,7 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
     }
 
     @Override
-    protected void setToolBar() {
+    protected void $setToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(FunctionUtil.nickname);
         setSupportActionBar(toolbar);
@@ -74,7 +75,7 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
 
     @Override
     protected void initView() {
-        setToolBar();
+        $setToolBar();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         View view = navigationView.getHeaderView(0);
@@ -103,6 +104,23 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
         navigationView.setNavigationItemSelectedListener(this);
         soundCb.setOnClickListener(this);
         vibrateCb.setOnClickListener(this);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position == 1)
+                    contactsFragment.loadFragmentData(1);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
@@ -114,6 +132,8 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
         soundCb.setChecked(PushSharedUtil.getInstance().getSound());
 
         setupViewPager(viewPager);
+
+        presenter.getPushInfo();
     }
 
     @Override
@@ -128,18 +148,18 @@ public class HomeActivity extends BaseActivity<HomeView, HomePresenter>
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.getPushInfo();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        presenter.onDestroy();
     }
 
     private void setupViewPager(ViewPager viewPager) {
         adapter = new HomeViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(MessageFragment.newInstance("message"), "消息");
-        adapter.addFragment(ContactsFragment.newInstance("contacts"), "联系人");
+        adapter.addFragment(contactsFragment = ContactsFragment.newInstance("contacts"), "联系人");
         adapter.addFragment(GroupFragment.newInstance("group"), "群组");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);

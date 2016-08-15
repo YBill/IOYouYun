@@ -74,11 +74,11 @@ public class FunctionUtil {
     public static final String DOWNLOAD_FILEID = "download_fileid";
     public static final String DOWNLOAD_PROGRESS = "download_progress";
 
-    public static final String CONFERENCEACTIVITY_PATH = "cn.youyunsample.media.ConferenceActivity";
-    public static final String VOIPACTIVITY_PATH = "cn.youyunsample.media.VoIPActivity";
-    public static final String BEINVITEACTIVITYACTIVITY_PATH = "cn.youyunsample.media.BeInviteActivity";
+    public static final String CONFERENCEACTIVITY_PATH = "com.ioyouyun.media.ConferenceActivity";
+    public static final String VOIPACTIVITY_PATH = "com.ioyouyun.media.VoIPActivity";
+    public static final String BEINVITEACTIVITYACTIVITY_PATH = "com.ioyouyun.media.BeInviteActivity";
     public static final String NOTIFYACTIVITYACTIVITY_PATH = "cn.youyunsample.home.NotifyActivity";
-    public static final String CHATACTIVITYACTIVITY_PATH = "cn.youyunsample.chat.ChatActivity";
+    public static final String CHATACTIVITYACTIVITY_PATH = "com.ioyouyun.chat.ChatActivity";
 
 
 
@@ -115,6 +115,19 @@ public class FunctionUtil {
             toast = Toast.makeText(YouyunApplication.application, msg, Toast.LENGTH_SHORT);
         else
             toast.setText(msg);
+        toast.show();
+    }
+
+    /**
+     * Toast
+     *
+     * @param resId
+     */
+    public static void toastMessage(int resId) {
+        if (toast == null)
+            toast = Toast.makeText(YouyunApplication.application, resId, Toast.LENGTH_SHORT);
+        else
+            toast.setText(resId);
         toast.show();
     }
 

@@ -124,12 +124,12 @@ public class ConferenceActivity extends BaseActivity<ConferenceView, ConferenceP
                 finish();
                 break;
             case R.id.tv_invite_member:
-                Intent intent = new Intent(this, InviteMemberActivity.class);
-                intent.putExtra("flag", 2);
-                intent.putExtra("invitedRoomId", invitedRoomId);
-                intent.putExtra("invitedRoomKey", invitedRoomKey);
-                intent.putExtra("invitedGroupId", invitedGroupId);
-                startActivityForResult(intent, REQUEST_CODE_INVITE_MEMBER);
+                Bundle bundle = new Bundle();
+                bundle.putInt(KEY_FLAG, 2);
+                bundle.putString(KEY_ROOMID, invitedRoomId);
+                bundle.putString(KEY_KEY, invitedRoomKey);
+                bundle.putString(KEY_GID, invitedGroupId);
+                $startActivityForResult(InviteMemberActivity.class, bundle, REQUEST_CODE_INVITE_MEMBER);
                 break;
             case R.id.tv_refresh_member:
                 getRoomList();

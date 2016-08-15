@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".contacts.InviteMemberActivity"
+    tools:showIn="@layout/activity_invite_member">
+
+    <fragment
+        android:id="@+id/fragment_contact"
+        android:name="com.ioyouyun.home.fragment.ContactsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_confirm_invite"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_corner_selector"
+        android:gravity="center"
+        android:text="@string/confirm_invite"
+        android:textColor="@color/color_ffffff"
+        android:textSize="16sp" />
+
+</RelativeLayout>

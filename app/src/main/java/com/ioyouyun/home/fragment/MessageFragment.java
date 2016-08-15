@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +11,10 @@ import android.view.ViewGroup;
 import com.ioyouyun.R;
 import com.ioyouyun.base.BaseFragment;
 import com.ioyouyun.chat.model.ChatMsgEntity;
-import com.ioyouyun.group.adapter.GroupListAdapter;
-import com.ioyouyun.home.HomeActivity;
 import com.ioyouyun.home.widgets.DividerItemDecoration;
 import com.ioyouyun.message.adapter.MessageListAdapter;
 import com.ioyouyun.message.presenter.MessagePresenter;
 import com.ioyouyun.message.view.MessageView;
-import com.ioyouyun.widgets.LoddingDialog;
 
 import java.util.List;
 
@@ -30,8 +26,6 @@ public class MessageFragment extends BaseFragment<MessageView, MessagePresenter>
     public static final String ARGUMENT_HOME_ID = "HOME_ID";
     private RecyclerView recyclerView;
     private MessageListAdapter messageAdapter;
-    private HomeActivity activity;
-    private LoddingDialog loddingDialog;
 
     public static MessageFragment newInstance(String homeId) {
         Bundle arguments = new Bundle();
@@ -43,13 +37,11 @@ public class MessageFragment extends BaseFragment<MessageView, MessagePresenter>
 
     public MessageFragment() {
         // Required empty public constructor
-        Log.v("Bill", "MessageFragment");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("Bill", "MessageFragment onCreate");
     }
 
     @Override
@@ -60,7 +52,6 @@ public class MessageFragment extends BaseFragment<MessageView, MessagePresenter>
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.v("Bill", "MessageFragment onCreateView");
         View view = inflater.inflate(R.layout.fragment_message, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_message);
         recyclerView.setMotionEventSplittingEnabled(false);
@@ -125,13 +116,4 @@ public class MessageFragment extends BaseFragment<MessageView, MessagePresenter>
         presenter.receiveNotify();
     }
 
-    @Override
-    public void showLoading() {
-
-    }
-
-    @Override
-    public void hideLoading() {
-
-    }
 }

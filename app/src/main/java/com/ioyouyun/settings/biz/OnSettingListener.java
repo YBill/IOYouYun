@@ -7,5 +7,5 @@ public interface OnSettingListener {
 
     void onSuccess(String response);
 
-    void onFaild();
+    void onFail();
 }

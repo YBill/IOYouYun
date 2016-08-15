@@ -148,7 +148,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             }
 
             @Override
-            public void onFaild() {
+            public void onFail() {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

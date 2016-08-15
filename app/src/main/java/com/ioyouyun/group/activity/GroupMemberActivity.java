@@ -1,6 +1,6 @@
 package com.ioyouyun.group.activity;
 
-import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +19,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemClick;
 
 public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemberPresenter> implements GroupMemberView {
 
@@ -30,11 +29,16 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
 
     private GroupMemberAdapter groupMemberAdapter;
     private String groupId;
-    private static final int REQUEST_CODE_INVITE_MEMBER = 1001;
 
     @Override
     protected GroupMemberPresenter initPresenter() {
         return new GroupMemberPresenter(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.getGroupMember(groupId);
     }
 
     @Override
@@ -43,15 +47,14 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
     }
 
     @Override
-    protected void setToolBar() {
-        super.setToolBar();
+    protected void $setToolBar() {
+        super.$setToolBar();
     }
 
     @Override
     protected void initView() {
         ButterKnife.bind(this);
-        getIntentExtra();
-        setToolBar();
+        $setToolBar();
     }
 
     @Override
@@ -59,18 +62,14 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
 
     }
 
-    private void getIntentExtra() {
-        Intent intent = getIntent();
-        if (intent != null)
-            groupId = intent.getStringExtra("gid");
-    }
-
     @Override
     protected void initData() {
         groupMemberAdapter = new GroupMemberAdapter(this);
         lvGroupMember.setAdapter(groupMemberAdapter);
 
-        presenter.getGroupMember(groupId);
+        Bundle bundle = $getIntentExtra();
+        if(null != bundle)
+            groupId = bundle.getString(KEY_GID);
     }
 
     @Override
@@ -88,10 +87,10 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_group_member) {
-            Intent intent = new Intent(this, InviteMemberActivity.class);
-            intent.putExtra("flag", 1);
-            intent.putExtra("gid", groupId);
-            startActivityForResult(intent, REQUEST_CODE_INVITE_MEMBER);
+            Bundle bundle = new Bundle();
+            bundle.putInt(KEY_FLAG, 1);
+            bundle.putString(KEY_GID, groupId);
+            $startActivity(InviteMemberActivity.class, bundle);
             return true;
         }
 
@@ -121,32 +120,4 @@ public class GroupMemberActivity extends BaseActivity<GroupMemberView, GroupMemb
         loddingDialog.cancleProgress();
     }
 
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_left:
-                finish();
-                break;
-            case R.id.btn_right:
-                Intent intent = new Intent(this, InviteMemberActivity.class);
-                intent.putExtra("flag", 1);
-                intent.putExtra("gid", groupId);
-                startActivityForResult(intent, REQUEST_CODE_INVITE_MEMBER);
-                break;
-        }
-    }
-
-    @OnItemClick(R.id.lv_group_member)
-    public void onItemClick(int position) {
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CODE_INVITE_MEMBER) {
-                presenter.getGroupMember(groupId);
-            }
-        }
-    }
 }

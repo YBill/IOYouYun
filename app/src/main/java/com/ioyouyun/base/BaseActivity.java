@@ -1,9 +1,12 @@
 package com.ioyouyun.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ioyouyun.R;
 import com.ioyouyun.widgets.LoddingDialog;
@@ -43,10 +46,65 @@ public abstract class BaseActivity<V, T extends BasePresenter<V>> extends AppCom
     ///////////////////////////ParentActivity/////////////////////////////////////
 
     protected LoddingDialog loddingDialog;
+    protected boolean isDebug = true;
+
+    protected final String KEY_FLAG = "key_flag"; // flag
+    protected final String KEY_GID = "key_gid"; // 群Id
+    protected final String KEY_ROOMID = "key_roomid"; // roomId
+    protected final String KEY_KEY = "key_key"; // key
+
+    // Log
+    protected void $Log(String msg) {
+        if (isDebug) {
+            Log.d(this.getClass().getName(), msg);
+        }
+    }
+
+    // Toast
+    protected void $toast(CharSequence msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    // startActivity
+    protected void $startActivity(Class<?> cls) {
+        $startActivity(cls, null);
+    }
+
+    // startActivity
+    protected void $startActivity(Class<?> cls, Bundle bundle) {
+        Intent intent = new Intent(this, cls);
+        if (bundle != null) {
+            intent.putExtras(bundle);
+        }
+        startActivity(intent);
+    }
+
+    // startActivityForResult
+    protected void $startActivityForResult(Class<?> cls, int requestCode) {
+        $startActivityForResult(cls, null, requestCode);
+    }
+
+    // startActivityForResult
+    protected void $startActivityForResult(Class<?> cls, Bundle bundle, int requestCode){
+        Intent intent = new Intent(this, cls);
+        if (bundle != null) {
+            intent.putExtras(bundle);
+        }
+        startActivityForResult(intent, requestCode);
+    }
+
+    // getIntent
+    protected Bundle $getIntentExtra() {
+        Intent intent = getIntent();
+        Bundle bundle = null;
+        if (null != intent)
+            bundle = intent.getExtras();
+        return bundle;
+    }
 
     // 通用title
-    protected  void setToolBar(){
-        Toolbar toolbar = findView(R.id.toolbar);
+    protected  void $setToolBar(){
+        Toolbar toolbar = $findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.back);
@@ -59,7 +117,7 @@ public abstract class BaseActivity<V, T extends BasePresenter<V>> extends AppCom
     }
 
     // findViewById
-    public <T extends View> T findView(int resId) {
+    public <T extends View> T $findViewById(int resId) {
         return (T) findViewById(resId);
     }
 

@@ -7,7 +7,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,7 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
     private RecyclerView recyclerView;
     private ContactsListAdapter contactsListAdapter;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
-    private int flag;
+    private int flag; // flag 1：HomeActivity 2:InviteMemberActivity
 
     @Override
     protected ContactsPresenter initPresenter() {
@@ -52,20 +51,17 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
 
     public ContactsFragment() {
         // Required empty public constructor
-        Log.v("Bill", "ContactsFragment");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("Bill", "ContactsFragment onCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this
-        Log.v("Bill", "ContactsFragment onCreateView");
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_contacts);
         recyclerView.setMotionEventSplittingEnabled(false);
@@ -77,7 +73,8 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
         contactsListAdapter.setOnItemClickLitener(new ContactsListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                presenter.onItemClick(position);
+                if(flag == 1)
+                    presenter.onItemClick(position);
             }
         });
 
@@ -110,13 +107,26 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
         presenter.onDestory();
     }
 
+    private void setData(){
+        if(flag == 1){
+            contactsListAdapter.setFlags(false);
+        }else if(flag == 2){
+            contactsListAdapter.setFlags(true);
+        }
+    }
+
     /**
      * @param flag 1：HomeActivity 2:InviteMemberActivity
      */
     public void loadFragmentData(int flag) {
         this.flag = flag;
+        setData();
     }
 
+    /**
+     * conference邀请人列表
+     * @return
+     */
     public List<String> getConferenceInviteList() {
         List<NearbyUserEntity> nearbyUserEntityList = presenter.getNearbyUserEntityList();
         List<String> list = new ArrayList<>();
@@ -128,6 +138,10 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
         return list;
     }
 
+    /**
+     * 群组邀请人列表
+     * @return
+     */
     public String getGroupInviteList() {
         StringBuffer stringBuffer = null;
         List<NearbyUserEntity> nearbyUserEntityList = presenter.getNearbyUserEntityList();

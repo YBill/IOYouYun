@@ -30,17 +30,17 @@ public class CreateGroupActivity extends BaseActivity<CreateGroupView, CreateGro
     }
 
     @Override
-    protected void setToolBar() {
-        super.setToolBar();
+    protected void $setToolBar() {
+        super.$setToolBar();
     }
 
     @Override
     protected void initView() {
-        setToolBar();
+        $setToolBar();
 
-        createBtn = findView(R.id.tv_confirm_create);
-        groupNameEdit = findView(R.id.et_group_name);
-        groupIntraEdit = findView(R.id.et_group_intra);
+        createBtn = $findViewById(R.id.tv_confirm_create);
+        groupNameEdit = $findViewById(R.id.et_group_name);
+        groupIntraEdit = $findViewById(R.id.et_group_intra);
     }
 
     @Override

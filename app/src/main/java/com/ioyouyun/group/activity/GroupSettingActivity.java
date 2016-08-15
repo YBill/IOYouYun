@@ -1,6 +1,6 @@
 package com.ioyouyun.group.activity;
 
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
@@ -42,8 +42,8 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
     }
 
     @Override
-    protected void setToolBar() {
-        super.setToolBar();
+    protected void $setToolBar() {
+        super.$setToolBar();
     }
 
     @Override
@@ -54,8 +54,7 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
     @Override
     protected void initView() {
         ButterKnife.bind(this);
-        getIntentExtra();
-        setToolBar();
+        $setToolBar();
     }
 
     @Override
@@ -63,15 +62,13 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
 
     }
 
-    private void getIntentExtra() {
-        Intent intent = getIntent();
-        if (intent != null)
-            groupId = intent.getStringExtra("gid");
-    }
-
     @Override
     protected void initData() {
         loddingDialog = new LoddingDialog(this);
+
+        Bundle bundle = $getIntentExtra();
+        if(null != bundle)
+            groupId = bundle.getString(KEY_GID);
 
         presenter.getGroupInfo(groupId);
     }
@@ -89,9 +86,9 @@ public class GroupSettingActivity extends BaseActivity<GroupSettingView, GroupSe
             case R.id.ll_group_intra:
                 break;
             case R.id.ll_group_member:
-                Intent intent = new Intent(this, GroupMemberActivity.class);
-                intent.putExtra("gid", groupId);
-                this.startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putString(KEY_GID, groupId);
+                $startActivity(GroupMemberActivity.class, bundle);
                 break;
             case R.id.tv_clear_chat:
                 String name = FunctionUtil.jointTableName(groupId);

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import com.ioyouyun.base.BasePresenter;
 import com.ioyouyun.chat.ChatActivity;
@@ -90,7 +89,6 @@ public class GroupPresenter extends BasePresenter<GroupView> {
     }
 
     public void onItemClick(int position) {
-        Toast.makeText(activity, groupInfoEntityList.get(position).getGid(), Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(activity, ChatActivity.class);
         intent.putExtra("toUid", groupInfoEntityList.get(position).getGid());
         intent.putExtra("nickName", groupInfoEntityList.get(position).getName());

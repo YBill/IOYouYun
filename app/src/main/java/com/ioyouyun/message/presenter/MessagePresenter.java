@@ -45,27 +45,19 @@ public class MessagePresenter extends BasePresenter<MessageView> {
      */
     public void getRecentContact() {
         Logger.v("本地查询联系人");
-        if (mView != null) {
-            mView.showLoading();
-        }
         messageList.clear();
         List list = YouyunDbManager.getIntance().getRecentContact();
         if (list != null)
             messageList.addAll(list);
         if (mView != null) {
-            mView.hideLoading();
             mView.refreshList(messageList);
         }
     }
 
     public void receiveNotify() {
         Logger.v("本地查询通知数");
-        if (mView != null) {
-            mView.showLoading();
-        }
         long count = YouyunDbManager.getIntance().getUnreadNotifyNum();
         if (mView != null) {
-            mView.hideLoading();
             mView.showNotify(count);
         }
     }
@@ -101,10 +93,6 @@ public class MessagePresenter extends BasePresenter<MessageView> {
             String tid = entity.getOppositeId();
             if (entity.getUnreadMsgNum() > 0) {
                 YouyunDbManager.getIntance().updateUnreadNumber(tid, 0);
-                entity.setUnreadMsgNum(0);
-                messageList.set(position, entity);
-                if (mView != null)
-                    mView.refreshList(messageList);
             }
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("toUid", tid);

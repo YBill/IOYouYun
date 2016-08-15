@@ -8,6 +8,7 @@ import com.ioyouyun.home.view.HomeView;
 import com.ioyouyun.settings.biz.OnSettingListener;
 import com.ioyouyun.settings.biz.SettingRequest;
 import com.ioyouyun.settings.biz.SettingRequestImpl;
+import com.weimi.media.WMedia;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +26,11 @@ public class HomePresenter extends BasePresenter<HomeView> {
         handler = new Handler(Looper.getMainLooper());
     }
 
+    // 注销
+    public void onDestroy(){
+        WMedia.getInstance().exit();
+    }
+
     /**
      * 获取Push信息
      */
@@ -36,7 +42,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
             }
 
             @Override
-            public void onFaild() {
+            public void onFail() {
 
             }
         });
@@ -56,7 +62,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
             }
 
             @Override
-            public void onFaild() {
+            public void onFail() {
 
             }
         });

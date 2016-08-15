@@ -2,12 +2,18 @@ package com.ioyouyun.chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -30,6 +36,7 @@ import com.ioyouyun.chat.adapter.ExpressionGridViewAdapter;
 import com.ioyouyun.chat.adapter.ExpressionPagerAdapter;
 import com.ioyouyun.chat.model.ChatMsgEntity;
 import com.ioyouyun.group.activity.GroupSettingActivity;
+import com.ioyouyun.home.widgets.ScrollChildSwipeRefreshLayout;
 import com.ioyouyun.utils.FileUtil;
 import com.ioyouyun.utils.FunctionUtil;
 import com.ioyouyun.wchat.message.ConvType;
@@ -64,6 +71,10 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     private ListView chatListView; // 聊天界面
     private TextView topTitleText; // title
     private TextView clearBtn; // 清空
+    private View recordingContainer; // 录音提示框
+    private ImageView micImage;
+    private TextView recordingHint;
+    private ScrollChildSwipeRefreshLayout swipeRefreshLayout;
 
     private ChatMsgAdapter chatMsgAdapter; // Chat Adapter
 
@@ -73,6 +84,30 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
      */
     private boolean isSpeck = false;
     private InputMethodManager manager;
+    private PowerManager.WakeLock wakeLock;
+    private Integer[] micImages = new Integer[]{
+            R.drawable.record_animate_01,
+            R.drawable.record_animate_02,
+            R.drawable.record_animate_03,
+            R.drawable.record_animate_04,
+            R.drawable.record_animate_05,
+            R.drawable.record_animate_06,
+            R.drawable.record_animate_07,
+            R.drawable.record_animate_08,
+            R.drawable.record_animate_09,
+            R.drawable.record_animate_10,
+            R.drawable.record_animate_11,
+            R.drawable.record_animate_12,
+            R.drawable.record_animate_13,
+            R.drawable.record_animate_14,
+    };
+    private Handler micImageHandler = new Handler() {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            // 切换msg切换图片
+            micImage.setImageResource(micImages[msg.what]);
+        }
+    };
 
     private File cameraFile;
     private String toUId;
@@ -91,34 +126,36 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     }
 
     @Override
-    protected void setToolBar() {
-        super.setToolBar();
+    protected void $setToolBar() {
+        super.$setToolBar();
     }
 
     @Override
     protected void initView() {
-        buttonSetModeVoice = findView(R.id.btn_set_mode_voice);
-        buttonPressToSpeak = findView(R.id.btn_press_to_speak);
-        textPressToSpeck = findView(R.id.tv_press_to_speck);
-        editLayout = findView(R.id.edittext_layout);
+        buttonSetModeVoice = $findViewById(R.id.btn_set_mode_voice);
+        buttonPressToSpeak = $findViewById(R.id.btn_press_to_speak);
+        textPressToSpeck = $findViewById(R.id.tv_press_to_speck);
+        editLayout = $findViewById(R.id.edittext_layout);
         editLayout.setBackgroundResource(R.drawable.input_bar_bg_normal);
         editLayout.requestFocus();
-        mEditTextContent = findView(R.id.et_sendmessage);
-        emojiIcon = findView(R.id.iv_emoticons_normal);
-        btnMore = findView(R.id.btn_more);
-        buttonSend = findView(R.id.btn_send);
-        modeView = findView(R.id.ll_more);
-        expressionViewPager = findView(R.id.vp_emoji);
-        emojiIconContainer = findView(R.id.ll_face_container);
-        btnContainer = findView(R.id.ll_btn_container);
-        photoGalleryBtn = findView(R.id.tv_picture);
-        takePhotoBtn = findView(R.id.tv_take_photo);
-        chatListView = findView(R.id.lv_chat);
-        topTitleText = findView(R.id.tv_title);
-        clearBtn = findView(R.id.btn_right);
-
-        getIntentExtra();
-        setToolBar();
+        mEditTextContent = $findViewById(R.id.et_sendmessage);
+        emojiIcon = $findViewById(R.id.iv_emoticons_normal);
+        btnMore = $findViewById(R.id.btn_more);
+        buttonSend = $findViewById(R.id.btn_send);
+        modeView = $findViewById(R.id.ll_more);
+        expressionViewPager = $findViewById(R.id.vp_emoji);
+        emojiIconContainer = $findViewById(R.id.ll_face_container);
+        btnContainer = $findViewById(R.id.ll_btn_container);
+        photoGalleryBtn = $findViewById(R.id.tv_picture);
+        takePhotoBtn = $findViewById(R.id.tv_take_photo);
+        chatListView = $findViewById(R.id.lv_chat);
+        topTitleText = $findViewById(R.id.tv_title);
+        clearBtn = $findViewById(R.id.btn_right);
+        recordingContainer = $findViewById(R.id.recording_container);
+        micImage = (ImageView) findViewById(R.id.mic_image);
+        recordingHint = (TextView) findViewById(R.id.recording_hint);
+        swipeRefreshLayout = $findViewById(R.id.refresh_layout);
+        $setToolBar();
     }
 
     @Override
@@ -172,6 +209,12 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
             public void afterTextChanged(Editable s) {
             }
         });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.getHistory(toUId, convType);
+            }
+        });
     }
 
     @Override
@@ -179,6 +222,11 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
         //启动activity时不自动弹出软键盘
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE))
+                .newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "youyun");
+
+        getIntentExtra();
 
         // init adapter
         chatMsgAdapter = new ChatMsgAdapter(this);
@@ -191,6 +239,14 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
         clearBtn.setVisibility(View.VISIBLE);
         topTitleText.setText(nickName);
         topTitleText.setVisibility(View.VISIBLE);
+
+        swipeRefreshLayout.setColorSchemeColors(
+                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.colorAccent),
+                ContextCompat.getColor(this, R.color.colorPrimaryDark)
+        );
+        // Set the scrolling view in the custom SwipeRefreshLayout.
+        swipeRefreshLayout.setScrollUpChild(chatListView);
     }
 
     @Override
@@ -234,9 +290,9 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
             case R.id.btn_right:
                 if (ConvType.group == convType) {
                     // 设置
-                    Intent intent = new Intent(this, GroupSettingActivity.class);
-                    intent.putExtra("gid", toUId);
-                    startActivityForResult(intent, REQUEST_CODE_SETTING);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(KEY_GID, toUId);
+                    $startActivityForResult(GroupSettingActivity.class, bundle, REQUEST_CODE_SETTING);
                 } else
                     presenter.clearLocalData(toUId);
                 break;
@@ -277,22 +333,6 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
 
         }
     }
-
-
-   /* private PullToRefreshBase.OnRefreshListener2<ListView> refreshListListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
-
-        @Override
-        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
-            //下拉
-            presenter.getHistory(toUId, convType);
-        }
-
-        @Override
-        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
-
-        }
-
-    };*/
 
     private String getEmojiStringByUnicode(int unicodeJoy) {
         return new String(Character.toChars(unicodeJoy));
@@ -433,20 +473,62 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    v.setPressed(true); // 更换背景, chat_press_speak_btn.xml
-                    textPressToSpeck.setText(getResources().getString(R.string.button_loosen_end));
-                    presenter.startRealTimeRecord(toUId, nickName, convType);
-                    break;
+                    if (!FunctionUtil.isExitsSdcard()) {
+                        FunctionUtil.toastMessage("发送语音需要sdcard支持！");
+                        return false;
+                    }
+                    try {
+                        v.setPressed(true); // 更换背景, chat_press_speak_btn.xml
+                        wakeLock.acquire();
+                        textPressToSpeck.setText(getResources().getString(R.string.button_loosen_end));
+                        recordingContainer.setVisibility(View.VISIBLE);
+                        recordingHint.setText(getString(R.string.move_up_to_cancel));
+                        recordingHint.setBackgroundColor(Color.TRANSPARENT);
+                        presenter.startRealTimeRecord(toUId, nickName, convType, micImageHandler);
+                    } catch (Resources.NotFoundException e) {
+                        e.printStackTrace();
+                        v.setPressed(false);
+                        if (wakeLock.isHeld())
+                            wakeLock.release();
+                        recordingContainer.setVisibility(View.GONE);
+                        FunctionUtil.toastMessage(R.string.recoding_fail);
+                        return false;
+                    }
+                    return true;
                 case MotionEvent.ACTION_UP:
                     v.setPressed(false);
                     textPressToSpeck.setText(getResources().getString(R.string.button_pushtotalk));
-                    presenter.stopRealTimeRecord();
-                    break;
+                    recordingContainer.setVisibility(View.INVISIBLE);
+                    if (wakeLock.isHeld())
+                        wakeLock.release();
+                    if (event.getY() < 0) {
+                        // discard the recorded audio.
+                        presenter.discardRecording(true);
+                    } else {
+                        // stop recording and send voice file
+                        presenter.discardRecording(false);
+                    }
+                    try {
+                        presenter.stopRealTimeRecord();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        FunctionUtil.toastMessage("发送失败，请检测服务器是否连接");
+                    }
+                    return true;
                 case MotionEvent.ACTION_MOVE:
-                    break;
+                    if (event.getY() < 0) {
+                        recordingHint.setText(getString(R.string.release_to_cancel));
+                        recordingHint.setBackgroundResource(R.drawable.recording_text_hint_bg);
+                    } else {
+                        recordingHint.setText(getString(R.string.move_up_to_cancel));
+                        recordingHint.setBackgroundColor(Color.TRANSPARENT);
+                    }
+                    return true;
+                default:
+                    recordingContainer.setVisibility(View.INVISIBLE);
+                    return false;
             }
 
-            return true;
         }
     }
 
@@ -467,6 +549,13 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
                 finish();
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (wakeLock.isHeld())
+            wakeLock.release();
     }
 
     @Override
@@ -492,7 +581,7 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
 
     @Override
     public void onCompleteLoad() {
-//        pullToRefreshListView.onRefreshComplete();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

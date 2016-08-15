@@ -60,6 +60,7 @@ public class FileUtil {
         File removeFile = new File(name);
         if (removeFile.exists()) {
             removeFile.delete();
+            Logger.d("删除文件：" + name);
         }
     }
 

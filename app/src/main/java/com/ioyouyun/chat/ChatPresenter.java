@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -92,7 +93,10 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         final String msgId = FunctionUtil.genLocalMsgId();
         JSONObject object = new JSONObject();
         try {
-            object.put("nickname", nickName);
+            if (ConvType.single == convType)
+                object.put("nickname", FunctionUtil.nickname);
+            else if (ConvType.group == convType)
+                object.put("nickname", nickName);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -143,7 +147,10 @@ public class ChatPresenter extends BasePresenter<ChatView> {
 
         JSONObject object = new JSONObject();
         try {
-            object.put("nickname", nickName);
+            if (ConvType.single == convType)
+                object.put("nickname", FunctionUtil.nickname);
+            else if (ConvType.group == convType)
+                object.put("nickname", nickName);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -484,17 +491,24 @@ public class ChatPresenter extends BasePresenter<ChatView> {
 
     /**
      * 按住说话
+     *
      * @param touid
      * @param nickName
      * @param convType
      */
-    synchronized public void startRealTimeRecord(String touid, String nickName, ConvType convType) {
+    synchronized public void startRealTimeRecord(String touid, String nickName, ConvType convType, Handler micHandler) {
         String spanId = FunctionUtil.genLocalMsgId();
         String audioName = FileUtil.getUserAudioPath(uid) + spanId + ".amr";
         Logger.v("audioName:" + audioName);
-        RecImpl recordCallBack = new RecImpl(spanId, audioName, touid, nickName, convType);
+        RecImpl recordCallBack = new RecImpl(spanId, audioName, touid, nickName, convType, micHandler);
         MediaManager.getMediaPlayManager().setRecordCallBack(recordCallBack);
         MediaManager.getMediaPlayManager().startRealTimeRecord(null, audioName);
+    }
+
+    // 废弃此次录音
+    private boolean discardRecord = false;
+    synchronized public void discardRecording(boolean discardRecord){
+        this.discardRecord = discardRecord;
     }
 
     synchronized public void stopRealTimeRecord() {
@@ -508,13 +522,15 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         private String toUid;
         private String nickName;
         private ConvType convType;
+        private Handler micHandler;
 
-        public RecImpl(String spanId, String audioName, String toUid, String nickName, ConvType convType) {
+        public RecImpl(String spanId, String audioName, String toUid, String nickName, ConvType convType, Handler micHandler) {
             this.spanId = spanId;
             this.audioName = audioName;
             this.toUid = toUid;
             this.nickName = nickName;
             this.convType = convType;
+            this.micHandler = micHandler;
         }
 
         @Override
@@ -531,6 +547,14 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         @Override
         synchronized public void recordStopCallback(long totalsize, int seqcount) {
             final String msgId = FunctionUtil.genLocalMsgId();
+
+            if(discardRecord){
+                chatRequest.sendVoiceContinue(msgId, toUid, spanId, Integer.MAX_VALUE, false, new byte[]{0},
+                        convType, null, null);
+                FileUtil.removeFile(audioName);
+                return;
+            }
+
             int al = (int) (Math.ceil(seqcount / 2.0));
             if (al <= 0)
                 return;
@@ -538,7 +562,10 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             JSONObject object = new JSONObject();
             try {
                 object.put("duration", audioLength);
-                object.put("nickname", nickName);
+                if (ConvType.single == convType)
+                    object.put("nickname", FunctionUtil.nickname);
+                else if (ConvType.group == convType)
+                    object.put("nickname", nickName);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -548,6 +575,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+
             chatRequest.sendVoiceContinue(msgId, toUid, spanId, seqcount + 1, true, new byte[]{0}, convType, padding, new OnChatListener() {
                 @Override
                 public void onSuccess() {
@@ -579,7 +607,16 @@ public class ChatPresenter extends BasePresenter<ChatView> {
 
         @Override
         synchronized public void recordVolumeCallback(long value) {
-            Logger.v("recordVolumeCallback:" + value);
+            int v = (int) ((value - 30) / 2);
+            if (v > 13) {
+                v = 13;
+            } else if (v < 0) {
+                v = 0;
+            }
+            Message message = micHandler.obtainMessage();
+            message.what = v;
+            micHandler.sendMessage(message);
+//            Logger.v(value + ":recordVolumeCallback:" + v);
         }
     }
 

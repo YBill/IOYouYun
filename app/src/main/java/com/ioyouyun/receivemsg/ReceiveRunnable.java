@@ -72,7 +72,7 @@ public class ReceiveRunnable implements Runnable {
             NoticeType type = weimiNotice.getNoticeType();
             Logger.v("消息类型:" + type);
 
-            handleExtendActionForMsgReceive(weimiNotice);
+//            handleExtendActionForMsgReceive(weimiNotice);
 
             if (NoticeType.textmessage == type) {
                 textMessageMethod(weimiNotice);
@@ -475,7 +475,9 @@ public class ReceiveRunnable implements Runnable {
             }
             spanList.add(audioMessage);
             audioMessageReceive.put(audioMessage.spanId, spanList);
-            if (audioMessage.spanSequenceNo == -1) {
+            if(audioMessage.spanSequenceNo == Integer.MAX_VALUE){
+                audioMessageReceive.remove(audioMessage.spanId);
+            } else if (audioMessage.spanSequenceNo == -1) {
                 Logger.v("语音接收结束");
 
                 String touchId = audioMessage.fromuid;
@@ -498,6 +500,8 @@ public class ReceiveRunnable implements Runnable {
                     }
                 }
 
+                audioMessageReceive.remove(audioMessage.spanId);
+
                 Logger.v("语音存储在：" + audioName);
 
                 ChatMsgEntity entity = new ChatMsgEntity();
@@ -511,7 +515,7 @@ public class ReceiveRunnable implements Runnable {
                     entity.setToId(toUid);
                 entity.setText(audioName);
                 entity.setTimestamp(audioMessage.time);
-                entity.setAudioTime(duration);
+                entity.setAudioTime(duration + "\"");
                 entity.setDirect(true);
                 entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_AUDIO);
                 entity.setConvType(audioMessage.convType);

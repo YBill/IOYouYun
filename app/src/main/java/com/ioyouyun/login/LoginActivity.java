@@ -28,15 +28,15 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
     }
 
     @Override
-    protected void setToolBar() {
-        super.setToolBar();
+    protected void $setToolBar() {
+        super.$setToolBar();
     }
 
     @Override
     protected void initView() {
-        setToolBar();
+        $setToolBar();
 
-        loginBtn = findView(R.id.btn_login);
+        loginBtn = $findViewById(R.id.btn_login);
     }
 
     @Override

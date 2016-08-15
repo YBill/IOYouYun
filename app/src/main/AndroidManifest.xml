@@ -63,7 +63,7 @@
         <!-- 高德API -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="ea2bac88b4136d4ac7126c3cccaa1b40" />
+            android:value="c8f62c4b4012f97c200f921f41f412e0" />
 
         <activity
             android:name=".home.HomeActivity"
