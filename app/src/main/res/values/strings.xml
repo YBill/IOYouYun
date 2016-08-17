@@ -91,5 +91,6 @@
     <string name="move_up_to_cancel">手指上滑，取消发送</string>
     <string name="release_to_cancel">松开手指，取消发送</string>
     <string name="recoding_fail">录音失败，请重试！</string>
+    <string name="incompatible_msg">收到一条不兼容的消息，请检查客户端版本是否最新。</string>
 
 </resources>

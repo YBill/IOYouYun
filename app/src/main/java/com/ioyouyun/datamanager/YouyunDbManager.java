@@ -66,7 +66,7 @@ public class YouyunDbManager {
                 YouyunDbHelper.AUDIOTIME + " VARCHAR," +
                 YouyunDbHelper.IMGTHUMBNAIL + " VARCHAR," +
                 YouyunDbHelper.IMGMSG + " VARCHAR," +
-                YouyunDbHelper.DIRECT + " INTEGER," +
+                YouyunDbHelper.ISSHOWTIME + " INTEGER," +
                 YouyunDbHelper.MSGTYPE + " INTEGER," +
                 YouyunDbHelper.CONVTYPE + " INTEGER" +
                 ")";
@@ -144,14 +144,14 @@ public class YouyunDbManager {
                 YouyunDbHelper.AUDIOTIME + "," +
                 YouyunDbHelper.IMGTHUMBNAIL + "," +
                 YouyunDbHelper.IMGMSG + "," +
-                YouyunDbHelper.DIRECT + "," +
+                YouyunDbHelper.ISSHOWTIME + "," +
                 YouyunDbHelper.MSGTYPE + "," +
                 YouyunDbHelper.CONVTYPE +
                 ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             db.execSQL(sql, new Object[]{entity.getMsgId(), entity.getFromId(), entity.getToId(), entity.getName(),
                     entity.getTimestamp(), entity.getText(), entity.getAudioTime(), entity.getImgThumbnail(),
-                    entity.getImgMsg(), entity.getDirectInt(entity), entity.getMsgTypeInt(entity),
+                    entity.getImgMsg(), entity.getShowTimeInt(entity), entity.getMsgType(),
                     entity.getConvTypeInt(entity)});
             return true;
         } catch (Exception e) {
@@ -202,6 +202,94 @@ public class YouyunDbManager {
     }
 
     /**
+     * 修改显示时间
+     *
+     * @param entity
+     * @param name
+     * @return
+     */
+    synchronized public boolean updateShowTime(ChatMsgEntity entity, String name) {
+        String tableName = YouyunDbHelper.CHAT_MSG_TABLE + name;
+        Logger.v("table:" + tableName);
+        if (!ifExistTable(tableName)) {
+            Logger.v(tableName + "不存在");
+            return false;
+        }
+        SQLiteDatabase db = youyunDbManager.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(YouyunDbHelper.ISSHOWTIME, entity.getShowTimeInt(entity));
+            String whereClause = YouyunDbHelper.MSG_ID + "=?";//修改条件
+            String[] whereArgs = {entity.getMsgId()};//修改条件的参数
+            int update = db.update(tableName, values, whereClause, whereArgs);
+            if (update != 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * 获取最后一条记录
+     *
+     * @param name
+     * @return
+     */
+    public ChatMsgEntity getLastChatMsgEntity(String name) {
+        String tableName = YouyunDbHelper.CHAT_MSG_TABLE + name;
+        Logger.v("table:" + tableName);
+        if (!ifExistTable(tableName)) {
+            Logger.v(tableName + "不存在");
+            return null;
+        }
+        SQLiteDatabase db = youyunDbManager.getReadableDatabase();
+        String sql = "SELECT * FROM " + tableName + " order by " + YouyunDbHelper.DATE + " DESC limit 0,1";
+        Cursor cursor = null;
+        ChatMsgEntity entity = null;
+        try {
+            cursor = db.rawQuery(sql, null);
+            if (cursor.moveToNext()) {
+                entity = new ChatMsgEntity();
+                entity.setMsgId(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.MSG_ID)));
+                entity.setFromId(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.FROM_ID)));
+                entity.setToId(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.TO_ID)));
+                entity.setName(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.NAME)));
+                entity.setTimestamp(Long.parseLong(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.DATE))));
+                entity.setText(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.TEXT)));
+                entity.setAudioTime(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.AUDIOTIME)));
+                entity.setImgThumbnail(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.IMGTHUMBNAIL)));
+                entity.setImgMsg(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.IMGMSG)));
+                entity.setShowTime(entity.getShowTimeBoolean(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.ISSHOWTIME))));
+                entity.setMsgType(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE)));
+                entity.setConvType(entity.getConvTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.CONVTYPE))));
+            }
+            return entity;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (db != null) {
+                try {
+                    db.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    /**
      * 查询会话聊天
      *
      * @param name
@@ -216,7 +304,7 @@ public class YouyunDbManager {
             return lists;
         }
         SQLiteDatabase db = youyunDbManager.getReadableDatabase();
-        String sql = "SELECT * FROM " + tableName;
+        String sql = "SELECT * FROM " + tableName + " order by " + YouyunDbHelper.DATE + " ASC";
         Cursor cursor = null;
         try {
             cursor = db.rawQuery(sql, null);
@@ -231,8 +319,8 @@ public class YouyunDbManager {
                 entity.setAudioTime(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.AUDIOTIME)));
                 entity.setImgThumbnail(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.IMGTHUMBNAIL)));
                 entity.setImgMsg(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.IMGMSG)));
-                entity.setDirect(entity.getDirectBoolean(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.DIRECT))));
-                entity.setMsgType(entity.getMsgTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE))));
+                entity.setShowTime(entity.getShowTimeBoolean(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.ISSHOWTIME))));
+                entity.setMsgType(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE)));
                 entity.setConvType(entity.getConvTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.CONVTYPE))));
                 lists.add(entity);
             }
@@ -304,7 +392,7 @@ public class YouyunDbManager {
                 ") VALUES(?,?,?,?,?,?,?)";
         try {
             db.execSQL(sql, new Object[]{entity.getOppositeId(), entity.getName(), entity.getTimestamp(),
-                    entity.getText(), entity.getMsgTypeInt(entity), entity.getConvTypeInt(entity),
+                    entity.getText(), entity.getMsgType(), entity.getConvTypeInt(entity),
                     entity.getUnreadMsgNum()});
             return true;
         } catch (Exception e) {
@@ -367,7 +455,7 @@ public class YouyunDbManager {
                 entity.setName(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.NAME)));
                 entity.setTimestamp(Long.parseLong(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.DATE))));
                 entity.setText(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.TEXT)));
-                entity.setMsgType(entity.getMsgTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE))));
+                entity.setMsgType(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE)));
                 entity.setConvType(entity.getConvTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.CONVTYPE))));
                 entity.setUnreadMsgNum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.UNREAD_MSG_NUM)));
                 return entity;
@@ -396,7 +484,7 @@ public class YouyunDbManager {
      */
     public List<ChatMsgEntity> getRecentContact() {
         SQLiteDatabase db = youyunDbManager.getReadableDatabase();
-        String sql = "SELECT * FROM " + YouyunDbHelper.TABLE_NAME_RECENT_CONTACT;
+        String sql = "SELECT * FROM " + YouyunDbHelper.TABLE_NAME_RECENT_CONTACT + " order by " + YouyunDbHelper.DATE + " DESC";
         Cursor cursor = null;
         try {
             cursor = db.rawQuery(sql, null);
@@ -407,7 +495,7 @@ public class YouyunDbManager {
                 entity.setName(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.NAME)));
                 entity.setTimestamp(Long.parseLong(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.DATE))));
                 entity.setText(cursor.getString(cursor.getColumnIndex(YouyunDbHelper.TEXT)));
-                entity.setMsgType(entity.getMsgTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE))));
+                entity.setMsgType(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.MSGTYPE)));
                 entity.setConvType(entity.getConvTypeEnum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.CONVTYPE))));
                 entity.setUnreadMsgNum(cursor.getInt(cursor.getColumnIndex(YouyunDbHelper.UNREAD_MSG_NUM)));
                 lists.add(entity);

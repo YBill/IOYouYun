@@ -7,7 +7,14 @@ import java.io.Serializable;
 /**
  * Created by 卫彪 on 2016/6/14.
  */
-public class ChatMsgEntity implements Serializable{
+public class ChatMsgEntity implements Serializable {
+
+    public static final int CHAT_TYPE_RECV_TEXT = 0; // 接收文本
+    public static final int CHAT_TYPE_SEND_TEXT = 1; // 发送文本
+    public static final int CHAT_TYPE_RECV_AUDIO = 2; // 接收语音
+    public static final int CHAT_TYPE_SEND_AUDIO = 3; // 发送语音
+    public static final int CHAT_TYPE_RECV_IMAGE = 4; // 接收图片
+    public static final int CHAT_TYPE_SEND_IMAGE = 5; // 发送图片
 
     private String msgId; // msg标记唯一一条数据
     private String fromId; // 消息from
@@ -19,76 +26,73 @@ public class ChatMsgEntity implements Serializable{
     private String audioTime; // 语音时间
     private String imgThumbnail; // 缩略图
     private String imgMsg; // json
-    private boolean direct; // 消息方向：true:recv false:send
     private ConvType convType;
-    private Chat_Msg_Type msgType; // 消息类型
-    public enum Chat_Msg_Type{
-        TYPE_TEXT,
-        TYPE_AUDIO,
-        TYPE_IMAGE
-    }
+    private int msgType; // 消息类型，取值为上面static final定义的常量
+    private boolean isShowTime; // 是否显示时间标签
     private int unreadMsgNum; // 未读消息数
+    private boolean isAudioPlaying; // 是否正在播放语音
 
     public ChatMsgEntity() {
     }
 
-    public ChatMsgEntity(long timestamp, String text, Chat_Msg_Type msgType, boolean direct) {
+    public ChatMsgEntity(long timestamp, String text, int msgType) {
         this.timestamp = timestamp;
         this.text = text;
         this.msgType = msgType;
-        this.direct = direct;
     }
 
-    public int getDirectInt(ChatMsgEntity entity){
-        int direct = 0; // send
-        if(entity.isDirect())
-            direct = 1; // recv
-        return direct;
-    }
-
-    public boolean getDirectBoolean(int direct){
-        boolean isDirect = false;
-        if(direct == 1)
-            isDirect = true;
-        return isDirect;
-    }
-
-    public int getMsgTypeInt(ChatMsgEntity entity){
-        int msgType = 0;
-        if(entity.getMsgType() == ChatMsgEntity.Chat_Msg_Type.TYPE_TEXT)
-            msgType = 1;
-        else if(entity.getMsgType() == ChatMsgEntity.Chat_Msg_Type.TYPE_AUDIO)
-            msgType = 2;
-        else if(entity.getMsgType() == ChatMsgEntity.Chat_Msg_Type.TYPE_IMAGE)
-            msgType = 3;
+    public int getMsgType() {
         return msgType;
     }
 
-    public Chat_Msg_Type getMsgTypeEnum(int type){
-        Chat_Msg_Type chat_msg_type = Chat_Msg_Type.TYPE_TEXT;
-        if(type == 1)
-            chat_msg_type = Chat_Msg_Type.TYPE_TEXT;
-        else if(type == 2)
-            chat_msg_type = Chat_Msg_Type.TYPE_AUDIO;
-        else if(type == 3)
-            chat_msg_type = Chat_Msg_Type.TYPE_IMAGE;
-        return chat_msg_type;
+    public void setMsgType(int msgType) {
+        this.msgType = msgType;
     }
 
-    public int getConvTypeInt(ChatMsgEntity entity){
+    public boolean isAudioPlaying() {
+        return isAudioPlaying;
+    }
+
+    public void setAudioPlaying(boolean audioPlaying) {
+        isAudioPlaying = audioPlaying;
+    }
+
+    public boolean isShowTime() {
+        return isShowTime;
+    }
+
+    public void setShowTime(boolean showTime) {
+        isShowTime = showTime;
+    }
+
+    public int getShowTimeInt(ChatMsgEntity entity) {
+        int showTime = 0; // 不显示
+        if (entity.isShowTime)
+            showTime = 1; // 显示
+        return showTime;
+    }
+
+    public boolean getShowTimeBoolean(int showTime) {
+        boolean isShowTime = false;
+        if (showTime == 1)
+            isShowTime = true;
+        return isShowTime;
+    }
+
+    public int getConvTypeInt(ChatMsgEntity entity) {
         int convType = 0;
-        if(entity.getConvType() == ConvType.single)
+        if (entity.getConvType() == ConvType.single)
             convType = 1;
-        else if(entity.getConvType() == ConvType.group)
+        else if (entity.getConvType() == ConvType.group)
             convType = 2;
         return convType;
     }
 
-    public ConvType getConvTypeEnum(int type){
+    public ConvType getConvTypeEnum(int type) {
         ConvType convType = ConvType.unknown;
-        if(type == 1)
+        if (type == 1)
             convType = ConvType.single;
-        else if(type == 2)
+        else if (type == 2)
             convType = ConvType.group;
         return convType;
     }
@@ -179,22 +183,6 @@ public class ChatMsgEntity implements Serializable{
 
     public void setImgMsg(String imgMsg) {
         this.imgMsg = imgMsg;
-    }
-
-    public Chat_Msg_Type getMsgType() {
-        return msgType;
-    }
-
-    public void setMsgType(Chat_Msg_Type msgType) {
-        this.msgType = msgType;
-    }
-
-    public boolean isDirect() {
-        return direct;
-    }
-
-    public void setDirect(boolean direct) {
-        this.direct = direct;
     }
 
     public ConvType getConvType() {

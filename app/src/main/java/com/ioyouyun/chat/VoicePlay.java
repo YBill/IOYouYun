@@ -1,4 +1,4 @@
-package com.ioyouyun.chat.biz;
+package com.ioyouyun.chat;
 
 import android.media.MediaPlayer;
 
@@ -12,7 +12,7 @@ public class VoicePlay {
 
     private static MediaPlayer mediaPlayer;
 
-    public static void playVoice(String filePath) {
+    public static void playVoice(String filePath, final OnPlayListener listener) {
         if (!(new File(filePath).exists())) {
             return;
         }
@@ -29,12 +29,14 @@ public class VoicePlay {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    mediaPlayer.release();
+                    stopPlayVoice(listener);
                     mediaPlayer = null;
-                    stopPlayVoice();
                 }
             });
             mediaPlayer.start();
+            if (listener != null) {
+                listener.audioPlay();
+            }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -47,10 +49,20 @@ public class VoicePlay {
 
     }
 
-    public static void stopPlayVoice() {
+    public static void stopPlayVoice(OnPlayListener listener) {
+        if (listener != null) {
+            listener.audioStop();
+        }
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
         }
     }
+
+    public interface OnPlayListener {
+        void audioPlay();
+
+        void audioStop();
+    }
+
 }

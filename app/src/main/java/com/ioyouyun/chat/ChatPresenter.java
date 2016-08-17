@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.hzmc.audioplugin.MediaManager;
 import com.ioyouyun.base.BasePresenter;
@@ -17,6 +16,7 @@ import com.ioyouyun.chat.biz.OnChatListener;
 import com.ioyouyun.chat.model.ChatMsgEntity;
 import com.ioyouyun.chat.model.ChatPicInfo;
 import com.ioyouyun.datamanager.YouyunDbManager;
+import com.ioyouyun.observer.MessageEvent;
 import com.ioyouyun.receivemsg.BroadCastCenter;
 import com.ioyouyun.utils.FileUtil;
 import com.ioyouyun.utils.FunctionUtil;
@@ -29,6 +29,9 @@ import com.ioyouyun.wchat.message.NoticeType;
 import com.ioyouyun.wchat.message.TextMessage;
 import com.ioyouyun.wchat.util.HttpCallback;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +52,6 @@ public class ChatPresenter extends BasePresenter<ChatView> {
 
     private ChatRequest chatRequest;
     private MyInnerReceiver receiver;
-    private String uid; // 自己的Id
     private Handler handler;
     public List<ChatMsgEntity> msgList = new ArrayList<>();
 
@@ -57,7 +59,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         handler = new Handler(Looper.getMainLooper());
         chatRequest = new ChatRequestImpl();
         registerReceiver();
-        uid = FunctionUtil.uid;
+        EventBus.getDefault().register(this);
     }
 
     /**
@@ -77,8 +79,9 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             BroadCastCenter.getInstance().unregisterReceiver(receiver);
     }
 
-    public void onDestory() {
+    public void onDestroy() {
         unregisterReceiver();
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -111,7 +114,10 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             @Override
             public void onSuccess() {
                 Logger.v("发送成功");
-                ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), text, ChatMsgEntity.Chat_Msg_Type.TYPE_TEXT, false);
+                if (mView != null)
+                    mView.clearChatContent();
+
+                ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), text, ChatMsgEntity.CHAT_TYPE_SEND_TEXT);
                 entity.setMsgId(msgId);
                 entity.setOppositeId(toUid);
                 entity.setFromId(FunctionUtil.uid);
@@ -120,8 +126,6 @@ public class ChatPresenter extends BasePresenter<ChatView> {
                 entity.setConvType(convType);
                 entity.setUnreadMsgNum(0);
                 refreshAdapter(entity);
-                if (mView != null)
-                    mView.clearChatContent();
                 insertDatas(entity);
             }
 
@@ -179,7 +183,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         if (thumbnail == null && path != null) {
             thumbnail = FileUtil.genSendImgThumbnail(path);
             if (thumbnail != null) {
-                thumbnailPath = FileUtil.getThumbnailPath(uid, msgId);
+                thumbnailPath = FileUtil.getThumbnailPath(FunctionUtil.uid, msgId);
                 FileUtil.saveImg(thumbnail, thumbnailPath); //保存缩略图
             }
         }
@@ -194,7 +198,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         chatRequest.sendImage(msgId, toUid, sendPath, fileName, convType, padding, thumbnail, new OnChatListener() {
             @Override
             public void onSuccess() {
-                ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), "", ChatMsgEntity.Chat_Msg_Type.TYPE_IMAGE, false);
+                ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), "", ChatMsgEntity.CHAT_TYPE_SEND_IMAGE);
                 entity.setMsgId(msgId);
                 entity.setOppositeId(toUid);
                 entity.setFromId(FunctionUtil.uid);
@@ -225,8 +229,10 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         List<ChatMsgEntity> list = YouyunDbManager.getIntance().getChatMsgEntityList(name);
         msgList.clear();
         msgList.addAll(list);
-        if (mView != null)
+        if (mView != null) {
             mView.showChatMsgList(msgList);
+            mView.setChatSelection(msgList.size() - 1);
+        }
     }
 
     /**
@@ -276,15 +282,12 @@ public class ChatPresenter extends BasePresenter<ChatView> {
                 for (HistoryMessage message : list) {
                     if (NoticeType.textmessage == message.type) {
                         TextMessage textMessage = (TextMessage) message.message;
-                        Logger.v("msgId:" + textMessage.msgId + "|fromId:" + textMessage.fromuid + "|toId:" + textMessage.touid + "|time:" + textMessage.time);
                         receiveText(textMessage);
                     } else if (NoticeType.audiomessage == message.type) {
                         AudioMessage audioMessage = (AudioMessage) message.message;
-                        Logger.v("msgId:" + audioMessage.msgId + "|fromId:" + audioMessage.fromuid + "|toId:" + audioMessage.touid + "|time:" + audioMessage.time);
                         receiveAudio(audioMessage);
                     } else if (NoticeType.filemessage == message.type) {
                         FileMessage fileMessage = (FileMessage) message.message;
-                        Logger.v("msgId:" + fileMessage.msgId + "|fromId:" + fileMessage.fromuid + "|toId:" + fileMessage.touid + "|time:" + fileMessage.time);
                         receiveFile(fileMessage);
                     }
                 }
@@ -312,9 +315,9 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         if (ConvType.group == fileMessage.convType) {
             toUid = toUid.substring(toUid.indexOf("$") + 1, toUid.lastIndexOf("$"));
         }
-        boolean direct = true;
+        int msgType = ChatMsgEntity.CHAT_TYPE_RECV_IMAGE;
         if (FunctionUtil.uid.equals(fileMessage.fromuid))
-            direct = false;
+            msgType = ChatMsgEntity.CHAT_TYPE_SEND_IMAGE;
 
         ChatMsgEntity entity = new ChatMsgEntity();
         entity.setMsgId(fileMessage.msgId);
@@ -323,12 +326,28 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         entity.setTimestamp(fileMessage.time);
         entity.setImgThumbnail(thumbnailPath);
         entity.setImgMsg(chatJson);
-        entity.setDirect(direct);
-        entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_IMAGE);
+        entity.setMsgType(msgType);
         entity.setConvType(fileMessage.convType);
+        entity.setUnreadMsgNum(0);
+        entity.setShowTime(true);
 
-        msgList.add(0, entity);
-        historyCount++;
+        String nickname = "";
+        if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_SEND_IMAGE) {
+            nickname = FunctionUtil.nickname;
+        } else if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_RECV_IMAGE) {
+            try {
+                String audioTime = new String(fileMessage.padding, "utf-8");
+                JSONObject object = new JSONObject(audioTime);
+                nickname = object.getString("nickname");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        entity.setName(nickname);
+
+        insertHistoryToDB(entity);
     }
 
     private Object audioLockObj = new Object();
@@ -343,13 +362,21 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             if (ConvType.group == audioMessage.convType) {
                 toUid = toUid.substring(toUid.indexOf("$") + 1, toUid.lastIndexOf("$"));
             }
-            boolean direct = true;
+            int msgType = ChatMsgEntity.CHAT_TYPE_RECV_AUDIO;
             if (FunctionUtil.uid.equals(audioMessage.fromuid))
-                direct = false;
+                msgType = ChatMsgEntity.CHAT_TYPE_SEND_AUDIO;
 
             String touchId = audioMessage.fromuid;
             String audioTime = new String(audioMessage.padding, "utf-8");
             JSONObject object = new JSONObject(audioTime);
+            String durtion = object.getString("duration");
+            String nickname = "";
+            if (msgType == ChatMsgEntity.CHAT_TYPE_SEND_AUDIO) {
+                nickname = FunctionUtil.nickname;
+            } else if (msgType == ChatMsgEntity.CHAT_TYPE_RECV_AUDIO) {
+                nickname = object.getString("nickname");
+            }
+
             String filePath = FileUtil.getUserAudioPath(touchId);
             String audioName = filePath + audioMessage.spanId + ".amr";
             File audioNameFile = new File(audioName);
@@ -368,17 +395,17 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             ChatMsgEntity entity = new ChatMsgEntity();
             entity.setTimestamp(audioMessage.time);
             entity.setText(audioName);
-            entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_AUDIO);
-            entity.setDirect(direct);
+            entity.setMsgType(msgType);
             entity.setMsgId(audioMessage.spanId);
             entity.setFromId(audioMessage.fromuid);
             entity.setToId(toUid);
-            entity.setAudioTime(object.getString("duration"));
+            entity.setAudioTime(durtion);
+            entity.setName(nickname);
             entity.setConvType(audioMessage.convType);
             entity.setUnreadMsgNum(0);
+            entity.setShowTime(true);
 
-            msgList.add(0, entity);
-            historyCount++;
+            insertHistoryToDB(entity);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -404,18 +431,64 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         if (ConvType.group == textMessage.convType) {
             toUid = toUid.substring(toUid.indexOf("$") + 1, toUid.lastIndexOf("$"));
         }
-        boolean direct = true;
+        int msgType = ChatMsgEntity.CHAT_TYPE_RECV_TEXT;
         if (FunctionUtil.uid.equals(textMessage.fromuid))
-            direct = false;
-        ChatMsgEntity entity = new ChatMsgEntity(textMessage.time, textMessage.text, ChatMsgEntity.Chat_Msg_Type.TYPE_TEXT, direct);
+            msgType = ChatMsgEntity.CHAT_TYPE_SEND_TEXT;
+        ChatMsgEntity entity = new ChatMsgEntity(textMessage.time, textMessage.text, msgType);
         entity.setMsgId(textMessage.msgId);
         entity.setFromId(textMessage.fromuid);
         entity.setToId(toUid);
         entity.setConvType(textMessage.convType);
         entity.setUnreadMsgNum(0);
+        entity.setShowTime(true);
+
+        String nickname = "";
+        if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_SEND_TEXT) {
+            nickname = FunctionUtil.nickname;
+        } else if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_RECV_TEXT) {
+            try {
+                String audioTime = new String(textMessage.padding, "utf-8");
+                JSONObject object = new JSONObject(audioTime);
+                nickname = object.getString("nickname");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        entity.setName(nickname);
+
+        insertHistoryToDB(entity);
+    }
+
+    synchronized private void insertHistoryToDB(ChatMsgEntity entity) {
+        historyCount++;
+
+        String oppositeId = "";
+        if (ConvType.single == entity.getConvType()) {
+            if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_SEND_TEXT ||
+                    entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_SEND_IMAGE ||
+                    entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_SEND_AUDIO) {
+                oppositeId = entity.getToId();
+            } else if (entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_RECV_TEXT ||
+                    entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_RECV_IMAGE ||
+                    entity.getMsgType() == ChatMsgEntity.CHAT_TYPE_RECV_AUDIO) {
+                oppositeId = entity.getFromId();
+            }
+        } else if (ConvType.group == entity.getConvType()) {
+            oppositeId = entity.getToId();
+        }
+        String name = FunctionUtil.jointTableName(oppositeId);
+        YouyunDbManager.getIntance().insertChatMessage(entity, name);
 
         msgList.add(0, entity);
-        historyCount++;
+        if (msgList.size() > 1) {
+            if (msgList.get(1).getTimestamp() - msgList.get(0).getTimestamp() <= FunctionUtil.MSG_TIME_SEPARATE) {
+                msgList.get(1).setShowTime(false);
+                YouyunDbManager.getIntance().updateShowTime(msgList.get(1), name);
+            }
+        }
+
     }
 
     /**
@@ -435,7 +508,19 @@ public class ChatPresenter extends BasePresenter<ChatView> {
      * @param entity
      */
     private void refreshAdapter(ChatMsgEntity entity) {
-        msgList.add(entity);
+        int index = msgList.size();
+        msgList.add(index, entity);
+        int preIndex = index - 1;
+        if (preIndex >= 0) {
+            if (msgList.get(index).getTimestamp() - msgList.get(preIndex).getTimestamp() > FunctionUtil.MSG_TIME_SEPARATE) {
+                msgList.get(index).setShowTime(true);
+                msgList.set(index, entity);
+            }
+        } else {
+            msgList.get(index).setShowTime(true);
+            msgList.set(index, entity);
+        }
+
         if (mView != null) {
             mView.showChatMsgList(msgList);
             mView.setChatSelection(msgList.size() - 1);
@@ -498,7 +583,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
      */
     synchronized public void startRealTimeRecord(String touid, String nickName, ConvType convType, Handler micHandler) {
         String spanId = FunctionUtil.genLocalMsgId();
-        String audioName = FileUtil.getUserAudioPath(uid) + spanId + ".amr";
+        String audioName = FileUtil.getUserAudioPath(FunctionUtil.uid) + spanId + ".amr";
         Logger.v("audioName:" + audioName);
         RecImpl recordCallBack = new RecImpl(spanId, audioName, touid, nickName, convType, micHandler);
         MediaManager.getMediaPlayManager().setRecordCallBack(recordCallBack);
@@ -507,7 +592,8 @@ public class ChatPresenter extends BasePresenter<ChatView> {
 
     // 废弃此次录音
     private boolean discardRecord = false;
-    synchronized public void discardRecording(boolean discardRecord){
+
+    synchronized public void discardRecording(boolean discardRecord) {
         this.discardRecord = discardRecord;
     }
 
@@ -548,7 +634,7 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         synchronized public void recordStopCallback(long totalsize, int seqcount) {
             final String msgId = FunctionUtil.genLocalMsgId();
 
-            if(discardRecord){
+            if (discardRecord) {
                 chatRequest.sendVoiceContinue(msgId, toUid, spanId, Integer.MAX_VALUE, false, new byte[]{0},
                         convType, null, null);
                 FileUtil.removeFile(audioName);
@@ -583,13 +669,13 @@ public class ChatPresenter extends BasePresenter<ChatView> {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), audioName, ChatMsgEntity.Chat_Msg_Type.TYPE_AUDIO, false);
+                            ChatMsgEntity entity = new ChatMsgEntity(System.currentTimeMillis(), audioName, ChatMsgEntity.CHAT_TYPE_SEND_AUDIO);
                             entity.setMsgId(msgId);
                             entity.setOppositeId(toUid);
                             entity.setFromId(FunctionUtil.uid);
                             entity.setToId(toUid);
                             entity.setName(nickName);
-                            entity.setAudioTime(audioLength + "\"");
+                            entity.setAudioTime(audioLength);
                             entity.setConvType(convType);
                             entity.setUnreadMsgNum(0);
                             refreshAdapter(entity);
@@ -616,8 +702,12 @@ public class ChatPresenter extends BasePresenter<ChatView> {
             Message message = micHandler.obtainMessage();
             message.what = v;
             micHandler.sendMessage(message);
-//            Logger.v(value + ":recordVolumeCallback:" + v);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void chatListEvent(MessageEvent.DownloadImageEvent event){
+        msgList.set(event.position, event.chatMsgEntity);
     }
 
     class MyInnerReceiver extends BroadcastReceiver {
@@ -626,7 +716,6 @@ public class ChatPresenter extends BasePresenter<ChatView> {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (FunctionUtil.MSG_TYPE_RECEIVE_TEXT.equals(action)) {
-                Log.v("Bill", "ChatPresenter receive");
                 ChatMsgEntity entity = (ChatMsgEntity) intent.getSerializableExtra(FunctionUtil.TYPE_TEXT);
                 refreshAdapter(entity);
             } else if (FunctionUtil.MSG_TYPE_RECEIVE_AUDIO.equals(action)) {

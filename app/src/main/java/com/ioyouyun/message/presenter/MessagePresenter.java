@@ -69,15 +69,19 @@ public class MessagePresenter extends BasePresenter<MessageView> {
      */
     public void receiveMessage(ChatMsgEntity chatMsgEntity) {
         boolean isHaveUser = false;
+        int index = -1;
         for (int i = 0; i < messageList.size(); i++) {
             if (chatMsgEntity.getOppositeId().equals(messageList.get(i).getOppositeId())) {
                 isHaveUser = true;
-                messageList.set(i, chatMsgEntity);
+                index = i;
                 break;
             }
         }
-        if (!isHaveUser)
-            messageList.add(chatMsgEntity);
+        if (isHaveUser){
+            // 删除当前位置记录，插入到头部
+            messageList.remove(index);
+        }
+        messageList.add(0, chatMsgEntity);
         if (mView != null)
             mView.refreshList(messageList);
     }

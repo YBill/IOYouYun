@@ -247,6 +247,8 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
         swipeRefreshLayout.setScrollUpChild(chatListView);
+
+        presenter.refreshLocalData(toUId);
     }
 
     @Override
@@ -317,7 +319,7 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.refreshLocalData(toUId);
+
     }
 
     private void getIntentExtra() {
@@ -561,7 +563,7 @@ public class ChatActivity extends BaseActivity<ChatView, ChatPresenter> implemen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.onDestory();
+        presenter.onDestroy();
     }
 
     @Override

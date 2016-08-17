@@ -18,11 +18,14 @@ import com.ioyouyun.chat.biz.OnChatListener;
 import com.ioyouyun.chat.model.ChatMsgEntity;
 import com.ioyouyun.chat.model.ChatPicInfo;
 import com.ioyouyun.datamanager.YouyunDbManager;
+import com.ioyouyun.observer.MessageEvent;
 import com.ioyouyun.receivemsg.BroadCastCenter;
 import com.ioyouyun.utils.FileUtil;
 import com.ioyouyun.utils.FunctionUtil;
 import com.ioyouyun.utils.Logger;
 import com.ioyouyun.wchat.message.ConvType;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by 卫彪 on 2016/6/20.
@@ -30,12 +33,14 @@ import com.ioyouyun.wchat.message.ConvType;
 public class ChatBigImageActivity extends Activity {
 
     private final static String CHAT_IMG_ENTITY = "chat_img_entity";
+    private final static String CHAT_POSITION = "chat_position";
     private ImageView imageView;
     private ChatRequest request;
     private MyInnerReceiver receiver;
     private String downloadPath;
     private ChatPicInfo chatPicInfo;
     private ChatMsgEntity chatMsgEntity;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +60,22 @@ public class ChatBigImageActivity extends Activity {
     private void setChatPicInfo(String imgPath){
         chatPicInfo.local = imgPath;
         chatMsgEntity.setImgMsg(ChatPicInfo.getJsonStr(chatPicInfo));
+        notifyChatList();
         String toid = chatMsgEntity.getFromId();
         if(ConvType.group == chatMsgEntity.getConvType())
             toid = chatMsgEntity.getToId();
         String name = FunctionUtil.jointTableName(toid);
         YouyunDbManager.getIntance().updateChatImageMsg(chatMsgEntity.getImgMsg(), chatMsgEntity.getMsgId(), name);
+    }
+
+    /**
+     * 通知聊天数据更新
+     */
+    private void notifyChatList(){
+        MessageEvent.DownloadImageEvent event = new MessageEvent.DownloadImageEvent();
+        event.position = position;
+        event.chatMsgEntity = chatMsgEntity;
+        EventBus.getDefault().post(event);
     }
 
     private void loadLocalImage(String path){
@@ -91,9 +107,10 @@ public class ChatBigImageActivity extends Activity {
         });
     }
 
-    public static void startActivity(Context activity, ChatMsgEntity entity){
+    public static void startActivity(Context activity, ChatMsgEntity entity, int position){
         Intent intent = new Intent(activity, ChatBigImageActivity.class);
         intent.putExtra(CHAT_IMG_ENTITY, entity);
+        intent.putExtra(CHAT_POSITION, position);
         activity.startActivity(intent);
     }
 
@@ -101,6 +118,7 @@ public class ChatBigImageActivity extends Activity {
         Intent intent = getIntent();
         if(intent != null){
             chatMsgEntity = (ChatMsgEntity) intent.getSerializableExtra(CHAT_IMG_ENTITY);
+            position = intent.getIntExtra(CHAT_POSITION, 0);
         }
     }
 

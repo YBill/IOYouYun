@@ -45,7 +45,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     @Override
     public void onBindViewHolder(final MessageViewHolder holder, int position) {
         ChatMsgEntity entity = messageList.get(position);
-        ChatMsgEntity.Chat_Msg_Type msgType = entity.getMsgType();
+        int msgType = entity.getMsgType();
         if (entity.getUnreadMsgNum() > 0) {
             holder.notifyText.setText("" + entity.getUnreadMsgNum());
             holder.notifyText.setVisibility(View.VISIBLE);
@@ -55,13 +55,16 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         holder.timeText.setText(prettyTime.format(new Date(entity.getTimestamp())));
 
         switch (msgType) {
-            case TYPE_TEXT:
+            case ChatMsgEntity.CHAT_TYPE_RECV_TEXT:
+            case ChatMsgEntity.CHAT_TYPE_SEND_TEXT:
                 holder.messageText.setText(entity.getText());
                 break;
-            case TYPE_AUDIO:
+            case ChatMsgEntity.CHAT_TYPE_RECV_AUDIO:
+            case ChatMsgEntity.CHAT_TYPE_SEND_AUDIO:
                 holder.messageText.setText("[语音]");
                 break;
-            case TYPE_IMAGE:
+            case ChatMsgEntity.CHAT_TYPE_RECV_IMAGE:
+            case ChatMsgEntity.CHAT_TYPE_SEND_IMAGE:
                 holder.messageText.setText("[图片]");
                 break;
         }

@@ -80,13 +80,35 @@ public class FunctionUtil {
     public static final String NOTIFYACTIVITYACTIVITY_PATH = "cn.youyunsample.home.NotifyActivity";
     public static final String CHATACTIVITYACTIVITY_PATH = "com.ioyouyun.chat.ChatActivity";
 
-
+    private static Context mAppContext;
 
     private static Toast toast;
     public static boolean isOnlinePlatform = true;
 
     public static String uid; // 用户ID
     public static String nickname; // 昵称
+
+    public static int mScreenWidth;
+    public static int mScreenHeigth;
+    public static float mDensity;
+
+    public static final long MSG_TIME_SEPARATE = 300000L; // IM时间间隔5分钟
+
+    public static void init(Context context) {
+        mAppContext = context;
+
+        mDensity = mAppContext.getResources().getDisplayMetrics().density;
+        mScreenWidth = mAppContext.getResources().getDisplayMetrics().widthPixels;
+        mScreenHeigth = mAppContext.getResources().getDisplayMetrics().heightPixels;
+        if (mScreenWidth > mScreenHeigth) {
+            mScreenWidth = mAppContext.getResources().getDisplayMetrics().heightPixels;
+            mScreenHeigth = mAppContext.getResources().getDisplayMetrics().widthPixels;
+        }
+    }
+
+    public static Context getmAppContext() {
+        return mAppContext;
+    }
 
     /**
      * 获取Android Id
@@ -251,6 +273,7 @@ public class FunctionUtil {
 
     /**
      * 拼接表名称
+     *
      * @param toId 对方Id或gid
      * @return
      */
@@ -265,6 +288,19 @@ public class FunctionUtil {
         String name = componentName.getClassName();
         Log.v("Bill", "currentActivity:" + name);
         return name;
+    }
+
+    public static final int AUDIO_RECORD_MAX_SEC_DEFAULT = 60;//语音录制默认最长时间
+    public static int calAudioViewWidth(int audioSecond) {
+        int minWidth = mScreenWidth / 4;
+        int maxWidth = mScreenWidth / 3 * 2;
+        int width = minWidth;
+        if (audioSecond <= 4) {
+            width = minWidth;
+        } else {
+            width += (maxWidth - minWidth) / (AUDIO_RECORD_MAX_SEC_DEFAULT - 4) * (audioSecond - 4);
+        }
+        return width;
     }
 
 }

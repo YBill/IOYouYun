@@ -29,8 +29,8 @@ public class YouyunDbHelper extends SQLiteOpenHelper {
     public static final String AUDIOTIME = "audiotime";
     public static final String IMGTHUMBNAIL = "imgthumbnail";
     public static final String IMGMSG = "imgmsg"; // 图片信息,JSON
-    public static final String DIRECT = "direct";
-    public static final String MSGTYPE = "msgtype"; // 消息类型,1:文本 2:语音 3:图片
+    public static final String ISSHOWTIME = "isshowtime";
+    public static final String MSGTYPE = "msgtype"; // 消息类型,取值见ChatMsgEntity类
     public static final String CONVTYPE = "convtype"; // 1:单聊 2:群聊
     public static final String UNREAD_MSG_NUM = "unread_msg_num"; // 未读消息数
 

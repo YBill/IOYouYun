@@ -361,8 +361,7 @@ public class ReceiveRunnable implements Runnable {
         entity.setTimestamp(fileMessage.time);
         entity.setImgThumbnail(thumbnailPath);
         entity.setImgMsg(chatJson);
-        entity.setDirect(true);
-        entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_IMAGE);
+        entity.setMsgType(ChatMsgEntity.CHAT_TYPE_RECV_IMAGE);
         entity.setConvType(fileMessage.convType);
 
         notify(FunctionUtil.MSG_TYPE_RECEIVE_IMAGE, FunctionUtil.TYPE_IMAGE, entity);
@@ -413,8 +412,7 @@ public class ReceiveRunnable implements Runnable {
         }
         entity.setTimestamp(textMessage.time);
         entity.setText(textMessage.text);
-        entity.setDirect(true);
-        entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_TEXT);
+        entity.setMsgType(ChatMsgEntity.CHAT_TYPE_RECV_TEXT);
         entity.setConvType(textMessage.convType);
 
         notify(FunctionUtil.MSG_TYPE_RECEIVE_TEXT, FunctionUtil.TYPE_TEXT, entity);
@@ -426,6 +424,8 @@ public class ReceiveRunnable implements Runnable {
             toid = entity.getToId();
         entity.setOppositeId(toid);
 
+        String name = FunctionUtil.jointTableName(toid);
+
         String currentActivity = FunctionUtil.getCurrentActivity();
         if (FunctionUtil.CHATACTIVITYACTIVITY_PATH.equals(currentActivity)) {
             entity.setUnreadMsgNum(0);
@@ -436,11 +436,20 @@ public class ReceiveRunnable implements Runnable {
             } else {
                 entity.setUnreadMsgNum(chatMsgEntity.getUnreadMsgNum() + 1);
             }
+
+            ChatMsgEntity lastEntity = YouyunDbManager.getIntance().getLastChatMsgEntity(name);
+            if(lastEntity == null || lastEntity.getTimestamp() <= 0){
+                entity.setShowTime(true);
+            }else{
+                if(entity.getTimestamp() - lastEntity.getTimestamp() > FunctionUtil.MSG_TIME_SEPARATE){
+                    entity.setShowTime(true);
+                }
+            }
+
         }
 
         setBroadCast(action, key, entity);
 
-        String name = FunctionUtil.jointTableName(toid);
         YouyunDbManager.getIntance().insertChatMessage(entity, name);
         YouyunDbManager.getIntance().insertRecentContact(entity);
     }
@@ -515,9 +524,8 @@ public class ReceiveRunnable implements Runnable {
                     entity.setToId(toUid);
                 entity.setText(audioName);
                 entity.setTimestamp(audioMessage.time);
-                entity.setAudioTime(duration + "\"");
-                entity.setDirect(true);
-                entity.setMsgType(ChatMsgEntity.Chat_Msg_Type.TYPE_AUDIO);
+                entity.setAudioTime(duration);
+                entity.setMsgType(ChatMsgEntity.CHAT_TYPE_RECV_AUDIO);
                 entity.setConvType(audioMessage.convType);
 
                 notify(FunctionUtil.MSG_TYPE_RECEIVE_AUDIO, FunctionUtil.TYPE_AUDIO, entity);
