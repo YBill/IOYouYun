@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.ioyouyun.base.BasePresenter;
 import com.ioyouyun.contacts.view.ContactDetailView;
 import com.ioyouyun.media.ConferenceActivity;
-import com.ioyouyun.media.VoIPActivity;
 import com.ioyouyun.receivemsg.BroadCastCenter;
 import com.ioyouyun.utils.FunctionUtil;
 import com.ioyouyun.utils.Logger;
@@ -34,25 +32,6 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     public ContactDetailPresenter(Activity activity) {
         this.activity = activity;
         registerReceiver();
-    }
-
-    /**
-     * VoIP
-     *
-     * @param uid
-     * @param nickName
-     */
-    public void callVoIP(String uid, String nickName) {
-        if (TextUtils.isEmpty(uid))
-            return;
-
-        Intent intent = new Intent(activity, VoIPActivity.class);
-        intent.putExtra("toUid", uid);
-        intent.putExtra("nickname", nickName);
-        intent.putExtra("isReceive", false);
-        activity.startActivity(intent);
-
-        WMedia.getInstance().call(uid);
     }
 
     /**

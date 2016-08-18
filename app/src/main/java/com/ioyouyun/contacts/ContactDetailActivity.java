@@ -3,6 +3,7 @@ package com.ioyouyun.contacts;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -15,6 +16,8 @@ import com.ioyouyun.base.BaseActivity;
 import com.ioyouyun.chat.ChatActivity;
 import com.ioyouyun.contacts.presenter.ContactDetailPresenter;
 import com.ioyouyun.contacts.view.ContactDetailView;
+import com.ioyouyun.media.VoIPActivity;
+import com.weimi.media.WMedia;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,6 +76,25 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
     }
 
     /**
+     * VoIP
+     *
+     * @param uid
+     * @param nickName
+     */
+    public void callVoIP(String uid, String nickName) {
+        if (TextUtils.isEmpty(uid))
+            return;
+
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_UID, uid);
+        bundle.putString(KEY_NICKNAME, nickName);
+        bundle.putBoolean(KEY_FLAG, false);
+        $startActivity(VoIPActivity.class, bundle);
+
+        WMedia.getInstance().call(uid);
+    }
+
+    /**
      * 选着对话框
      */
     private void showSwitchDialog() {
@@ -89,7 +111,7 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
             @Override
             public void onClick(View arg0) {
                 dialog.cancel();
-                presenter.callVoIP(uid, nickName);
+                callVoIP(uid, nickName);
             }
         });
         btnConference.setOnClickListener(new View.OnClickListener() {

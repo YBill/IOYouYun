@@ -20,20 +20,6 @@ public class IncommingCallPresenter extends BasePresenter<IncommingCallView> {
     }
 
     /**
-     * 接听
-     */
-    public void answer(String callName) {
-        boolean result = WMedia.getInstance().answer();
-        if (result) {
-            Intent intent = new Intent(activity, VoIPActivity.class);
-            intent.putExtra("toUid", callName);
-            intent.putExtra("isReceive", true);
-            activity.startActivity(intent);
-            activity.finish();
-        }
-    }
-
-    /**
      * 挂断
      */
     public void decline() {

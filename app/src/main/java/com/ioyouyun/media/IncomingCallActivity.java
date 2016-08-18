@@ -10,6 +10,7 @@ import com.ioyouyun.base.BaseActivity;
 import com.ioyouyun.media.presenter.IncommingCallPresenter;
 import com.ioyouyun.media.view.IncommingCallView;
 import com.ioyouyun.utils.FunctionUtil;
+import com.weimi.media.WMedia;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,8 +62,19 @@ public class IncomingCallActivity extends BaseActivity<IncommingCallView, Incomm
         }
     }
 
-    private void answer() {
-        presenter.answer(callName);
+    /**
+     * 接听
+     */
+    public void answer(String callName) {
+        boolean result = WMedia.getInstance().answer();
+        if (result) {
+            Bundle bundle = new Bundle();
+            bundle.putString(KEY_UID, callName);
+            bundle.putString(KEY_NICKNAME, callName);
+            bundle.putBoolean(KEY_FLAG, true);
+            $startActivity(VoIPActivity.class, bundle);
+            finish();
+        }
     }
 
     private void decline() {
@@ -74,7 +86,7 @@ public class IncomingCallActivity extends BaseActivity<IncommingCallView, Incomm
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_answer:
-                answer();
+                answer(callName);
                 break;
             case R.id.tv_hangup:
                 decline();

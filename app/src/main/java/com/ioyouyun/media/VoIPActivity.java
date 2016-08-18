@@ -1,6 +1,5 @@
 package com.ioyouyun.media;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +42,6 @@ public class VoIPActivity extends BaseActivity<VoIPView, VoIPPresenter> implemen
     @Override
     protected void initView() {
         ButterKnife.bind(this);
-        getIntentExtra();
     }
 
     @Override
@@ -51,17 +49,14 @@ public class VoIPActivity extends BaseActivity<VoIPView, VoIPPresenter> implemen
 
     }
 
-    private void getIntentExtra() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            uid = intent.getStringExtra("toUid");
-            nickName = intent.getStringExtra("nickname");
-            isReceive = intent.getBooleanExtra("isReceive", false);
-        }
-    }
-
     @Override
     protected void initData() {
+        Bundle bundle = $getIntentExtra();
+        uid = bundle.getString(KEY_UID);
+        nickName = bundle.getString(KEY_NICKNAME);
+        isReceive = bundle.getBoolean(KEY_FLAG);
+
+
         btnLeft.setVisibility(View.VISIBLE);
         tvUid.setText(uid);
         tvNickname.setText(nickName);
