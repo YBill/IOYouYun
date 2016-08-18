@@ -1,19 +1,15 @@
 package com.ioyouyun.contacts.presenter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.ioyouyun.base.BasePresenter;
-import com.ioyouyun.contacts.ContactDetailActivity;
 import com.ioyouyun.contacts.biz.ContactRequest;
 import com.ioyouyun.contacts.biz.ContactRequestImpl;
 import com.ioyouyun.contacts.biz.OnContactListener;
@@ -163,13 +159,6 @@ public class ContactsPresenter extends BasePresenter<ContactView> implements AMa
             locationClient = null;
             locationOption = null;
         }
-    }
-
-    public void onItemClick(int position) {
-        Intent intent = new Intent(activity, ContactDetailActivity.class);
-        intent.putExtra("toUid", nearbyUserEntityList.get(position).getId());
-        intent.putExtra("nickName", nearbyUserEntityList.get(position).getNickname());
-        activity.startActivity(intent);
     }
 
     /**

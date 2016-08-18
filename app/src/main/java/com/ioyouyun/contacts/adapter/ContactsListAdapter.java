@@ -82,6 +82,10 @@ public class ContactsListAdapter extends RecyclerView.Adapter<ContactsListAdapte
         return contactsList.size();
     }
 
+    public NearbyUserEntity getItem(int position){
+        return contactsList.get(position);
+    }
+
     public interface OnItemClickLitener {
         void onItemClick(View view, int position);
     }

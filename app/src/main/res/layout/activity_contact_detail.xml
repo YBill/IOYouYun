@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_ffffff"
-    android:orientation="vertical"
-    tools:context="cn.youyunsample.home.ContactDetailActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".contacts.ContactDetailActivity">
 
-    <include layout="@layout/layout_top" />
-
-    <include
-        layout="@layout/layout_users_big"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_margin="10dp" />
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <TextView
-        android:id="@+id/tv_contact_im"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/shape_btn_contact_detail"
-        android:gravity="center"
-        android:text="@string/contact_im"
-        android:textSize="16sp" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
 
-    <TextView
-        android:id="@+id/tv_contact_voip"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/shape_btn_contact_detail"
-        android:gravity="center"
-        android:text="@string/contact_voip"
-        android:textSize="16sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:text="@string/contact_detail"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
 
-</LinearLayout>
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_contact_detail" />
+
+</android.support.design.widget.CoordinatorLayout>

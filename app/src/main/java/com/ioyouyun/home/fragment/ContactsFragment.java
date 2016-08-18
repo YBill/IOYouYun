@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.ioyouyun.R;
 import com.ioyouyun.base.BaseFragment;
+import com.ioyouyun.contacts.ContactDetailActivity;
 import com.ioyouyun.contacts.adapter.ContactsListAdapter;
 import com.ioyouyun.contacts.model.NearbyUserEntity;
 import com.ioyouyun.contacts.presenter.ContactsPresenter;
@@ -73,8 +74,12 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
         contactsListAdapter.setOnItemClickLitener(new ContactsListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(flag == 1)
-                    presenter.onItemClick(position);
+                if (flag == 1) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(KEY_UID, contactsListAdapter.getItem(position).getId());
+                    bundle.putString(KEY_NICKNAME, contactsListAdapter.getItem(position).getNickname());
+                    $startActivity(ContactDetailActivity.class, bundle);
+                }
             }
         });
 
@@ -107,10 +112,10 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
         presenter.onDestory();
     }
 
-    private void setData(){
-        if(flag == 1){
+    private void setData() {
+        if (flag == 1) {
             contactsListAdapter.setFlags(false);
-        }else if(flag == 2){
+        } else if (flag == 2) {
             contactsListAdapter.setFlags(true);
         }
     }
@@ -125,6 +130,7 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
 
     /**
      * conference邀请人列表
+     *
      * @return
      */
     public List<String> getConferenceInviteList() {
@@ -140,6 +146,7 @@ public class ContactsFragment extends BaseFragment<ContactView, ContactsPresente
 
     /**
      * 群组邀请人列表
+     *
      * @return
      */
     public String getGroupInviteList() {

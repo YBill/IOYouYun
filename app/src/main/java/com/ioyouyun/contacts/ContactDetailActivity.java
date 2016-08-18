@@ -22,10 +22,6 @@ import butterknife.OnClick;
 
 public class ContactDetailActivity extends BaseActivity<ContactDetailView, ContactDetailPresenter> implements ContactDetailView {
 
-    @BindView(R.id.tv_top_title)
-    TextView tvTopTitle;
-    @BindView(R.id.btn_left)
-    Button btnLeft;
     @BindView(R.id.tv_nickname)
     TextView tvNickname;
     @BindView(R.id.tv_uid)
@@ -46,9 +42,14 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
     }
 
     @Override
+    protected void $setToolBar() {
+        super.$setToolBar();
+    }
+
+    @Override
     protected void initView() {
         ButterKnife.bind(this);
-        getIntentExtra();
+        $setToolBar();
     }
 
     @Override
@@ -56,19 +57,11 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
 
     }
 
-    private void getIntentExtra() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            uid = intent.getStringExtra("toUid");
-            nickName = intent.getStringExtra("nickName");
-        }
-    }
-
     @Override
     protected void initData() {
-        tvTopTitle.setText(getResources().getString(R.string.contact_detail));
-        tvTopTitle.setVisibility(View.VISIBLE);
-        btnLeft.setVisibility(View.VISIBLE);
+        Bundle bundle = $getIntentExtra();
+        uid = bundle.getString(KEY_UID);
+        nickName = bundle.getString(KEY_NICKNAME);
 
         tvNickname.setText(nickName);
         tvUid.setText(uid);
@@ -130,12 +123,9 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
         dialog.show();
     }
 
-    @OnClick({R.id.btn_left, R.id.tv_contact_im, R.id.tv_contact_voip})
+    @OnClick({R.id.tv_contact_im, R.id.tv_contact_voip})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_left:
-                finish();
-                break;
             case R.id.tv_contact_im:
                 Intent intent = new Intent(this, ChatActivity.class);
                 intent.putExtra("toUid", uid);
@@ -148,15 +138,5 @@ public class ContactDetailActivity extends BaseActivity<ContactDetailView, Conta
                 showSwitchDialog();
                 break;
         }
-    }
-
-    @Override
-    public void showLoading() {
-
-    }
-
-    @Override
-    public void hideLoading() {
-
     }
 }

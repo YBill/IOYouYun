@@ -48,8 +48,10 @@ public abstract class BaseActivity<V, T extends BasePresenter<V>> extends AppCom
     protected LoddingDialog loddingDialog;
     protected boolean isDebug = true;
 
-    protected final String KEY_FLAG = "key_flag"; // flag
+    protected final String KEY_UID = "key_uid"; // 用户Id
+    protected final String KEY_NICKNAME = "key_nickname"; // 昵称
     protected final String KEY_GID = "key_gid"; // 群Id
+    protected final String KEY_FLAG = "key_flag"; // flag
     protected final String KEY_ROOMID = "key_roomid"; // roomId
     protected final String KEY_KEY = "key_key"; // key
 
